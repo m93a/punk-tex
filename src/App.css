@@ -22,6 +22,7 @@
   font-size: large;
   display: flex;
   flex-direction: row;
+  text-align: left;
 }
 
 .App-intro > * {
@@ -31,4 +32,8 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+#render-target {
+  padding-left: 20px;
 }
