@@ -11,11 +11,13 @@ import './theme';
 
 
 // Compiler
-import * as markdownIt from 'markdown-it';
+import * as MarkdownIt from 'markdown-it';
 import * as IncrementalDOM from 'incremental-dom';
-import markdownItIncrementalDOM from 'markdown-it-incremental-dom';
+import mdIncrementalDOM from 'markdown-it-incremental-dom';
+import TexZilla from 'texzilla';
+import mdMath from 'markdown-it-math';
 
-const md = markdownIt({
+const md = MarkdownIt({
   breaks: false,
   html: true,
   quotes: "„“‚‘",
@@ -23,8 +25,20 @@ const md = markdownIt({
 });
 
 md.use(
-  markdownItIncrementalDOM,
+  mdIncrementalDOM,
   IncrementalDOM
+);
+
+md.use(
+  mdMath,
+  {
+    inlineRenderer(str: string) {
+        return TexZilla.toMathMLString(str);
+    },
+    blockRenderer(str: string) {
+        return TexZilla.toMathMLString(str, true);
+    }
+  }
 );
 
 
@@ -87,6 +101,10 @@ we get like
 +Infinity
 likes?
 \`\`\`
+
+$$$
+3 + 2 \in ℝ
+$$$
 
 <script src="asdf">var bar; if (jar) far();</script>`;
 
