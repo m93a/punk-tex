@@ -1,6 +1,14 @@
 # punk-tex
 The fuck'em-all alternative to traditional typesetting systems
 
+## How to download, build and run
+```
+git clone https://github.com/m93a/punk-tex
+cd punk-tex
+npm i
+npm start
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
