@@ -1,6 +1,28 @@
 @namespace url('http://www.w3.org/1999/xhtml');
 @namespace m url('http://www.w3.org/1998/Math/MathML');
 
+@font-face {
+  font-family: "Computer Modern";
+  src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunss.otf');
+}
+@font-face {
+  font-family: "Computer Modern";
+  src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunsx.otf');
+  font-weight: bold;
+}
+@font-face {
+  font-family: "Computer Modern";
+  src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunsi.otf');
+  font-style: italic, oblique;
+}
+@font-face {
+  font-family: "Computer Modern";
+  src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunbxo.otf');
+  font-weight: bold;
+  font-style: italic, oblique;
+}
+
+
 .App {
   text-align: center;
 }
@@ -40,16 +62,5 @@
 
 #render-target {
   padding-left: 20px;
-}
-
-#render-target m|mtext {
-  font-family: Latin Modern;
-}
-
-#render-target m|math {
-  font-family: Latin Modern Math;
-}
-
-#render-target m|math m|annotation {
-  display: none;
+  font-family: "Computer Modern";
 }

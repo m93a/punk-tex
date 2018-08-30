@@ -1,6 +1,7 @@
 // Global
 import * as React from 'react';
 import './App.css';
+// import './math.css';
 import logo from './logo.svg';
 
 
@@ -12,7 +13,7 @@ import './theme';
 
 // Compiler
 import * as MarkdownIt from 'markdown-it';
-import * as IncrementalDOM from 'incremental-dom';
+import * as IncrementalDOM from './lib/incremental-dom';
 import mdIncrementalDOM from 'markdown-it-incremental-dom';
 import TexZilla from 'texzilla';
 import mdMath from 'markdown-it-math';
@@ -63,7 +64,7 @@ class App extends React.Component {
             defaultValue={sampleText}
           />
 
-          <div id="renderTarget" />
+          <div id="render-target" />
         </div>
       </div>
     );
@@ -72,7 +73,7 @@ class App extends React.Component {
   public onTyping = (code: string) =>
   {
     IncrementalDOM.patch(
-      document.getElementById('renderTarget') as Element,
+      document.getElementById('render-target') as Element,
       md.renderToIncrementalDOM(code)
     )
   };
@@ -103,7 +104,7 @@ likes?
 \`\`\`
 
 $$$
-3 + 2 \in ℝ
+\\sum^\\infty_{n=0} 3 + 2 \\in \\iiint^\\varepsilon_\\frac{-1}{12} ℝ
 $$$
 
 <script src="asdf">var bar; if (jar) far();</script>`;
