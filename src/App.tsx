@@ -17,6 +17,7 @@ import * as IncrementalDOM from './lib/incremental-dom';
 import mdIncrementalDOM from 'markdown-it-incremental-dom';
 import TexZilla from 'texzilla';
 import mdMath from 'markdown-it-math';
+import mdReplace from 'markdown-it-replacements';
 
 const md = MarkdownIt({
   breaks: false,
@@ -41,6 +42,24 @@ md.use(
     }
   }
 );
+
+[
+  ['copyright', '©'],
+  ['registered', '®'],
+  ['tm', '™'],
+  ['S', '§'],
+  ['dag', '†']
+]
+.forEach( entry =>
+  mdReplace.replacements.push({
+    default: true,
+    name: entry[0],
+    re: RegExp('\\\\' + entry[0], 'g'),
+    sub(s: string) { return entry[1]; },
+  })
+);
+
+md.use(mdReplace);
 
 
 

@@ -9,6 +9,37 @@ npm i
 npm start
 ```
 
+## Syntax
+The PunkTEX syntax is based on [Markdown](https://commonmark.org/help/) with some extensions.
+
+### Equations
+You can write LaTEX equations enclosed in `$$` for inline equation and `$$$` for a block equation.
+
+```markdown
+Skrrat, skidi-kat-kat <br>
+Boom <br>
+$$2 + 2 = 4$$, minus one that's three, quick maths <br>
+Everyday man's on the block, smoke trees <br>
+
+$$$
+\sum_{n=0}^\infty n = -\frac{1}{12}
+$$$
+```
+
+Note that inline equations have to start right after the first `$$` and end right before the second `$$` – no spaces between the dollars and the first/last character of the equation are allowed.
+
+### Typographic replacements
+* `--` → `­–`
+* `---` → `—`
+* `+-` → `±`
+* `...` → `…`
+* `\copyright` → `©`
+* `\registered` → `®`
+* `\tm` → `™`
+* `\S` → `§`
+* `\dag` → `†`
+
+
 ## Available Scripts
 
 In the project directory, you can run:
