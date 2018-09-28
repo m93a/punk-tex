@@ -5,127 +5,64 @@ import './App.css';
 import logo from './logo.svg';
 
 
-// Editor
-import Ace from 'react-ace';
-import 'brace/mode/markdown';
-import './theme';
+import Navigation from './Navigation';
+import state, { State } from './state';
+
+import Tab        from './tab';
+import Editor     from './tab/Editor';
+import Preview    from './tab/Preview';
+import References from './tab/ReferenceManager';
 
 
-// Compiler
-import * as MarkdownIt from 'markdown-it';
-import * as IncrementalDOM from './lib/incremental-dom';
-import mdIncrementalDOM from 'markdown-it-incremental-dom';
-import TexZilla from 'texzilla';
-import mdMath from 'markdown-it-math';
-import mdReplace from 'markdown-it-replacements';
+const availableTabs: (typeof Tab)[] = [Editor, Preview, References];
 
-const md = MarkdownIt({
-  breaks: false,
-  html: true,
-  quotes: "„“‚‘",
-  xhtmlOut: true,
-});
+state.tabs = [Editor, Preview];
 
-md.use(
-  mdIncrementalDOM,
-  IncrementalDOM
-);
-
-md.use(
-  mdMath,
+class App extends React.Component
+{
+  public render()
   {
-    inlineRenderer(str: string) {
-        return TexZilla.toMathMLString(str);
-    },
-    blockRenderer(str: string) {
-        return TexZilla.toMathMLString(str, true);
-    }
-  }
-);
-
-[
-  ['copyright', '©'],
-  ['registered', '®'],
-  ['tm', '™'],
-  ['S', '§'],
-  ['dag', '†']
-]
-.forEach( entry =>
-  mdReplace.replacements.push({
-    default: true,
-    name: entry[0],
-    re: RegExp('\\\\' + entry[0], 'g'),
-    sub(s: string) { return entry[1]; },
-  })
-);
-
-md.use(mdReplace);
-
-
-
-
-class App extends React.Component {
-  public render() {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Editor</h1>
+          <div className="App-title">
+            <img src={logo} className="App-logo" alt="logo" />
+            <span className="punkTEX">
+              <span className="punkTEX-punk">punk</span>
+              <span className="punkTEX-TEX">T<span className="punkTEX-E">E</span>X</span>
+            </span>
+          </div>
+
+          <Navigation
+            columns={2}
+            state={state}
+            tabs={availableTabs}
+          />
         </header>
         <div className="App-intro">
-
-          <Ace
-            mode="markdown"
-            theme="decent"
-            onChange={this.onTyping}
-            name="editor"
-            editorProps={{$blockScrolling: true}}
-            defaultValue={sampleText}
-          />
-
-          <div id="render-target" />
+          {
+            state.tabs.map( (T, i) => <T key={i} state={state} />)
+          }
         </div>
       </div>
     );
   }
 
-  public onTyping = (code: string) =>
+  public update = () =>
   {
-    IncrementalDOM.patch(
-      document.getElementById('render-target') as Element,
-      md.renderToIncrementalDOM(code)
-    )
-  };
+    this.forceUpdate();
+  }
 
-  public componentDidMount() { this.onTyping(sampleText); }
+  public componentDidMount()
+  {
+    state.addEventListener(State.Event.TabChange, this.update);
+  }
+
+  public componentWillUnmount()
+  {
+    state.removeEventListener(State.Event.TabChange, this.update);
+  }
 
 }
-
-const sampleText = `# Heading
-How *are* __you__, [human](being)?
-* I
-* am
-* a
-* \`computer\`
-
-
-1. wow
-2. this
-3. is
-4. so
-5. sad
-
-
-\`\`\`can
-we get like
-+Infinity
-likes?
-\`\`\`
-
-$$$
-\\sum^\\infty_{n=0} 3 + 2 \\in \\iiint^\\varepsilon_\\frac{-1}{12} ℝ
-$$$
-
-<script src="asdf">var bar; if (jar) far();</script>`;
 
 export default App;
