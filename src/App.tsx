@@ -31,6 +31,7 @@ class App extends React.Component
               <span className="punkTEX-punk">punk</span>
               <span className="punkTEX-TEX">T<span className="punkTEX-E">E</span>X</span>
             </span>
+            <span>v0.1-beta</span>
           </div>
 
           <Navigation

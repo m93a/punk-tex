@@ -16,7 +16,7 @@
     "no-unused-expression": false,
     "no-namespace": false,
     "no-empty-interface": false,
-    
+
     "interface-name": false,
     "max-classes-per-file": false,
     "array-type": false,

@@ -4,6 +4,8 @@ import Tab from '.';
 import { State } from '../state';
 import { Event } from '../event';
 
+import Reference from '../Reference';
+
 
 class ReferenceManager extends Tab
 {
@@ -12,6 +14,22 @@ class ReferenceManager extends Tab
     public render()
     {
         return <div>
+            <Reference
+                state={this.props.state}
+                id=''
+                title='GitHub'
+                partTitle='Levenberg-marquardt'
+                partSubtitle='Curve fitting method in javascript'
+                authors={{
+                names: [
+                    { name: 'Miguel Angel', surname: 'Asencio Hurtado' },
+                    { name: 'Jose Alejandro', surname: 'Bolanos Arroyave'},
+                    { name: 'Michaël', surname: 'Zasso'}
+                ],
+                etAl: true
+                }}
+                online
+            />
             <div>ID: <input /></div>
             <div>Title: <input /></div>
             <div>Author: <input placeholder="name" /><input placeholder="surname" /></div>
