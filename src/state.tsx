@@ -1,12 +1,15 @@
 import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './event';
 import sampleText from './sampleText';
 import Tab from './tab';
+import Reference from './Reference';
+import sampleReferences from './sampleReferences';
 
 export interface State
 extends EventTarget<State.Event>
 {
-    content: string;
     tabs: (typeof Tab)[];
+    content: string;
+    references: Reference.Params[];
 }
 
 export namespace State
@@ -14,7 +17,8 @@ export namespace State
     export enum Event
     {
         ContentChange = 'contentchange',
-        TabChange = 'tabchange'
+        TabChange = 'tabchange',
+        ReferencesChange = 'referenceschange'
     }
 }
 
@@ -24,8 +28,9 @@ export const state: State =
     removeEventListener,
     dispatchEvent,
     
+    tabs: [],
     content: sampleText,
-    tabs: []
+    references: sampleReferences
 }
 
 export default state;

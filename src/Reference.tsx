@@ -1,11 +1,21 @@
 import * as React from 'react';
 import * as moment from 'moment';
-import { State } from './state';
 
 class Reference extends React.Component<Reference.Props>
 {
     public render()
     {
+        // Format
+
+        const format = this.props.format || Reference.Format.CSN_ISO_690;
+
+        if (format !== Reference.Format.CSN_ISO_690)
+        {
+            throw new Error('The chosen format is yet to be implemented.');
+        }
+
+        
+
         // Authors
 
         let etAl = this.props.authors.etAl;
@@ -81,7 +91,7 @@ class Reference extends React.Component<Reference.Props>
             {
                 title = <span>
                     <b>{partTitle}. </b>
-                    <i>{mainTitle}</i> [online].
+                    <i>{mainTitle}</i> [online]. {' '}
                 </span>
             }
             else
@@ -97,7 +107,7 @@ class Reference extends React.Component<Reference.Props>
             if (this.props.online)
             {
                 title = <span>
-                    <b><i>{mainTitle}</i></b> [online].
+                    <b><i>{mainTitle}</i></b> [online]. {' '}
                 </span>
             }
             else
@@ -106,6 +116,19 @@ class Reference extends React.Component<Reference.Props>
                     <b><i>{mainTitle}. </i></b>
                 </span>
             }
+        }
+
+        
+
+        // Edition
+
+        let edition = '';
+
+        if (this.props.edition)
+        {
+            edition = this.props.edition.trim();
+            if (edition[edition.length - 1] !== '.') edition += '.';
+            edition += ' ';
         }
 
 
@@ -133,23 +156,63 @@ class Reference extends React.Component<Reference.Props>
         if (this.props.referenced)
         {
             const cit = moment(this.props.referenced).format('YYYY-MM-DD');
-            published += ' cit [' + cit + ']';
+            published += ' [cit. ' + cit + ']';
         }
 
         if (published) published += '. ';
 
 
 
+        // Identifier
+
+        let identifier = '';
+
+        if (this.props.identifier)
+        {
+            identifier = this.props.identifier + '. ';
+        }
+
+
+
+        // URL
+
+        const url: React.ReactNode[] = [];
+
+        if (this.props.url)
+        {
+            if (this.props.online)
+            {
+                url.push('Dostupné z: ');
+            }
+            else
+            {
+                url.push('Dostupné také z: ');
+            }
+
+            url.push(<a href={this.props.url.href}>{this.props.url.href}</a>);
+            url.push('. ');
+        }
+
+
+
         return <span>
             {authors}
             {title}
+            {edition}
             {published}
+            {identifier}
+            {url}
         </span>;
     }
 }
 
 namespace Reference
 {
+    export enum Format
+    {
+        CSN_ISO_690
+    }
+
     export interface Author
     {
         name: string;
@@ -173,6 +236,7 @@ namespace Reference
 
         datePublished?: string;
         placePublished?: string;
+        edition?: string;
 
         identifier?: string;
         url?: URL;
@@ -182,7 +246,7 @@ namespace Reference
 
     export interface Props extends Params
     {
-        state: State;
+        format?: Format;
     }
 }
 
