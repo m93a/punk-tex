@@ -27,7 +27,7 @@ export const state: State =
     addEventListener,
     removeEventListener,
     dispatchEvent,
-    
+
     tabs: [],
     content: sampleText,
     references: sampleReferences

@@ -9,7 +9,7 @@ import Reference from '../Reference';
 
 class ReferenceManager extends Tab
 {
-    public static get title() { return 'References' };
+    public static get title() { return 'References'; }
 
     public render()
     {

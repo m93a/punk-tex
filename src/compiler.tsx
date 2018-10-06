@@ -6,6 +6,9 @@ import TexZilla from 'texzilla';
 import mdMath from 'markdown-it-math';
 import mdReplace from 'markdown-it-replacements';
 
+import state from './state';
+import references from './compiler-extensions/references';
+
 const md = MarkdownIt({
   breaks: false,
   html: true,
@@ -48,6 +51,8 @@ md.use(
 );
 
 md.use(mdReplace);
+
+md.use(references, state);
 
 
 export function renderToElement(id: string, code: string)
