@@ -4,38 +4,31 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 declare module 'markdown-it' {
-
     interface MarkdownItStatic {
         new (): MarkdownIt.MarkdownIt;
         new (presetName: "commonmark" | "zero" | "default", options?: MarkdownIt.Options): MarkdownIt.MarkdownIt;
         new (options: MarkdownIt.Options): MarkdownIt.MarkdownIt;
         (): MarkdownIt.MarkdownIt;
-        (presetName: "commonmark" | "zero" | "default", options ?: MarkdownIt.Options): MarkdownIt.MarkdownIt;
+        (presetName: "commonmark" | "zero" | "default", options?: MarkdownIt.Options): MarkdownIt.MarkdownIt;
         (options: MarkdownIt.Options): MarkdownIt.MarkdownIt;
+        Token: MarkdownIt.Token;
     }
     
     var MarkdownIt: MarkdownItStatic;
     export = MarkdownIt;
     
-    module MarkdownIt {
+    namespace MarkdownIt {
         interface MarkdownIt {
             render(md: string, env?: any): string;
             renderInline(md: string, env?: any): string;
             parse(src: string, env: any): Token[];
             parseInline(src: string, env: any): Token[];
-    
-            /*
-            // The following only works in 3.0
-            // Since it's still not allowed to target 3.0, i'll leave the code commented out
-    
-            use<T extends Array<any> = any[]>(
+
+            use<T extends any[] = any[]>(
                 plugin: (md: MarkdownIt, ...params: T) => void,
                 ...params: T
             ): MarkdownIt;
-            */
-    
-            use(plugin: (md: MarkdownIt, ...params: any[]) => void, ...params: any[]): MarkdownIt;
-    
+            
             utils: {
                 assign(obj: any): any;
                 isString(obj: any): boolean;
@@ -149,7 +142,7 @@ declare module 'markdown-it' {
             ruler: RulerInline;
             ruler2: RulerInline;
         }
-
+    
         interface Delimiter {
             close: boolean;
             end: number;
@@ -236,5 +229,11 @@ declare module 'markdown-it' {
             tight: boolean;
         }
     }
-    
+}
+
+declare module 'markdown-it/lib/token' {
+    import { Token as TokenInterface } from 'markdown-it';
+
+    const Token: TokenInterface;
+    export default Token;
 }

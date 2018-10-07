@@ -1,5 +1,8 @@
 declare module 'markdown-it-incremental-dom'
 {
-    const fn: any;
-    export default fn;
+    import { MarkdownIt } from 'markdown-it';
+    import * as IncrementalDOM from 'incremental-dom';
+
+    function insertPlugin(md: MarkdownIt, id: typeof IncrementalDOM): void;
+    export default insertPlugin;
 }

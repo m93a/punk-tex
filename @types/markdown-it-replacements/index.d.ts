@@ -1,16 +1,23 @@
 declare module 'markdown-it-replacements'
 {
-    function MarkdownItReplacements(...args: any[]): any;
+    import { MarkdownIt } from 'markdown-it';
+    export default MarkdownItReplacements;
+
+    function MarkdownItReplacements(
+        md: MarkdownIt,
+        rules?: { [name: string]: boolean }
+    ): void;
 
     namespace MarkdownItReplacements
     {
-        const replacements: {
-            name: string,
-            re: RegExp,
-            sub(s: string): string,
-            default: boolean,
-        }[];
+        const replacements: Rule[];
     }
 
-    export default MarkdownItReplacements;
+    export interface Rule
+    {
+        name: string;
+        re: RegExp;
+        sub(s: string): string;
+        default: boolean;
+    }
 }
