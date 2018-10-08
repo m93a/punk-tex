@@ -1,8 +1,13 @@
+import * as React from 'react';
+
 import { MarkdownIt, RuleInline } from 'markdown-it';
 import { State } from '../state';
+import { renderAsInlineToken } from '../lib/markdown-it-react-interop';
 
 export default function insertPlugin(md: MarkdownIt, appState: State)
 {
+    let n = 0;
+
     const cite: RuleInline = (state, silent) =>
     {
         const delim = '&';
@@ -36,20 +41,23 @@ export default function insertPlugin(md: MarkdownIt, appState: State)
 
         if (!silent)
         {
-            let token = state.push('mark_begin', 'mark', 1);
-            token.markup = fullCommand;
-
-            token = state.push('text', '', 0);
-            token.content = 'Citace: ' + content;
-
-            token = state.push('mark_end', 'mark', -1);
-            token.markup = ')';
+            const el = <mark>[{n++}] Citace: {content}</mark>;
+            renderAsInlineToken(state, el);
         }
 
         state.pos = ++pos;
         return true;
         
     };
-  
+
+
+    const parse_old = md.parse;
+    md.parse = function(...args: [string, any])
+    {
+        n = 0;
+        return parse_old.call(this, ...args);
+    }
+
+
     md.inline.ruler.after('newline', 'amp-cite', cite);
 };

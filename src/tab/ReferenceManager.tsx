@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import Tab from '.';
 import { State } from '../state';
-import { Event } from '../event';
+import Event from '../lib/react-helpers/Event';
 
 import Reference from '../Reference';
 

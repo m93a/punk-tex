@@ -1,4 +1,6 @@
 
+// tslint:disable:no-shadowed-variable
+
 export interface EventTarget<T extends string = string>
 {
     addEventListener(name: T, callback: (data: Event<T>) => void): void;
@@ -16,7 +18,7 @@ abstract class EventParams
 }
 
 
-export class Event<T extends string = string> extends EventParams
+class Event<T extends string = string> extends EventParams
 {
     public name: T;
     public timeStamp: number;
@@ -30,12 +32,6 @@ export class Event<T extends string = string> extends EventParams
         this.timeStamp = Date.now();
     }
 }
-
-export namespace Event
-{
-    export interface Params extends EventParams {}
-}
-
 
 
 const eventDatabase = new WeakMap<EventTarget, Map<string, Set<(data?: Event) => void>>>();
@@ -82,7 +78,6 @@ class SampleImplementation implements EventTarget
     }
 }
 
-
 export const
 {
     addEventListener,
@@ -90,3 +85,19 @@ export const
     dispatchEvent
 }
 = SampleImplementation.prototype;
+
+
+namespace Event
+{
+    export interface Target extends EventTarget {}
+    export interface Params extends EventParams {}
+    export const
+    {
+        addEventListener,
+        removeEventListener,
+        dispatchEvent
+    }
+    = SampleImplementation.prototype;
+}
+
+export default Event;

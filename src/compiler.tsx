@@ -2,7 +2,7 @@
 import * as MarkdownIt from 'markdown-it';
 import * as IncrementalDOM from './lib/incremental-dom';
 import mdIncrementalDOM from 'markdown-it-incremental-dom';
-import TexZilla from 'texzilla';
+import * as TexZilla from 'texzilla';
 import mdMath from 'markdown-it-math';
 import mdReplace from 'markdown-it-replacements';
 

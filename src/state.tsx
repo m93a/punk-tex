@@ -1,4 +1,4 @@
-import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './event';
+import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';
 import sampleText from './sampleText';
 import Tab from './tab';
 import Reference from './Reference';
