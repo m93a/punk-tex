@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Iter from '../lib/react-helpers/Iterable'
 
 import Tab from '.';
 import { State } from '../state';
@@ -15,11 +16,13 @@ class ReferenceManager extends Tab
     {
         return <div>
             {
-                this.props.state.references.map( r =>
-                    <div key={r.id}>
-                        <span>{'[' + r.id + '] '}</span>
-                        <Reference {...r} />
-                    </div>
+                Array.from(
+                    Iter.map(this.props.state.references.values(), r =>
+                        <div key={r.id}>
+                            <span>{'[' + r.id + '] '}</span>
+                            <Reference {...r} />
+                        </div>
+                    )
                 )
             }
             <hr />

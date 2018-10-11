@@ -8,6 +8,7 @@ import mdReplace from 'markdown-it-replacements';
 
 import state from './state';
 import references from './compiler-extensions/references';
+import punktex from './compiler-extensions/punktex';
 
 const md = MarkdownIt({
   breaks: false,
@@ -53,6 +54,7 @@ md.use(
 md.use(mdReplace);
 
 md.use(references, state);
+md.use(punktex);
 
 
 export function renderToElement(id: string, code: string)

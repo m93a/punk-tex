@@ -1,0 +1,200 @@
+@namespace url('http://www.w3.org/1999/xhtml');
+@namespace m url('http://www.w3.org/1998/Math/MathML');
+@namespace s url('http://www.w3.org/2000/svg');
+
+@font-face {
+  font-family: "CMU Sans";
+  src: url('./fonts/cmunss.otf');
+}
+@font-face {
+  font-family: "CMU Sans";
+  src: url('./fonts/cmunsx.otf');
+  font-weight: bold;
+}
+@font-face {
+  font-family: "CMU Sans";
+  src: url('./fonts/cmunsi.otf');
+  font-style: italic, oblique;
+}
+@font-face {
+  font-family: "CMU Sans";
+  src: url('./fonts/cmunbxo.otf');
+  font-weight: bold;
+  font-style: italic, oblique;
+}
+@font-face {
+  font-family: 'CMU Serif';
+  src: url('./fonts/cmunrm.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'CMU Serif';
+  src: url('./fonts/cmunbx.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+	font-family: 'CMU Serif';
+	src: url('./fonts/cmunti.ttf');
+	font-weight: normal;
+	font-style: italic;
+}
+@font-face {
+	font-family: 'CMU Serif';
+	src: url('./fonts/cmunbi.ttf');
+	font-weight: bold;
+	font-style: italic;
+}
+@font-face {
+  font-family: 'Purisa';
+  src: url('./fonts/purisa.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Purisa';
+  src: url('./fonts/purisab.ttf');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Purisa';
+  src: url('./fonts/purisao.ttf');
+  font-weight: normal;
+  font-style: oblique;
+}
+@font-face {
+  font-family: 'Purisa';
+  src: url('./fonts/purisabo.ttf');
+  font-weight: bold;
+  font-style: oblique;
+}
+
+
+
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+  margin: 0 -10px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  display: flex;
+  width: fit-content;
+  width: -moz-fit-content;
+  margin: auto;
+}
+
+.App-title .punkTeX {
+  font-size: 2.3em;
+  margin-top: .3em;
+}
+
+.App-navigation {
+  margin-top: 25px;
+}
+
+.App-tab-button {
+  display: inline-block;
+  background: rgb(6, 6, 37);
+  border-right: solid black 1px;
+  padding: 0;
+  margin: 5px;
+  height: 2em;
+  font-weight: bolder;
+}
+
+.App-tab-button > span,
+.App-tab-button > button {
+  display: inline-block;
+  padding: 5px 10px;
+  border: solid black 1px;
+  border-right: none;
+  vertical-align: bottom;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.App-tab-button > button {
+  background: none;
+  padding: 0 3px;
+  vertical-align: middle;
+}
+
+.App-tab-button > button > s|svg {
+  stroke: white;
+  fill: white;
+}
+
+.App-intro {
+  font-size: large;
+  display: flex;
+  flex-direction: row;
+  text-align: left;
+}
+
+.App-intro > * {
+  flex: 1 100%;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+#editor {
+  font-size: 16px;
+}
+
+
+
+.TeX {
+  font-family: "CMU Serif";
+}
+.TeX-e {
+  position: relative;
+  top: .25em;
+  margin-left:  -0.2em;
+  margin-right: -0.15em;
+}
+.LaTeX-a {
+  position: relative;
+  font-size: 0.75em;
+  bottom: 0.25em;
+  margin-left: -0.5em;
+  margin-right: -0.25em;
+}
+.punkTeX-punk {
+  font-family: "Purisa";
+  font-weight: bold;
+  font-style: italic;
+  letter-spacing: -0.08em;
+}
+.punkTeX .TeX {
+  position: relative;
+  bottom: 0.02em;
+  font-size: 1.2em;
+}
+
+
+.render-target {
+  padding-left: 20px;
+  font-family: "CMU Serif";
+}
+
+.render-target .error {
+  background: yellow;
+}

@@ -1,8 +1,8 @@
 // Global
 import * as React from 'react';
-import './App.css';
+import './styles/App.css';
 // import './math.css';
-import logo from './logo.svg';
+import logo from './styles/logo.svg';
 
 
 import Navigation from './Navigation';
@@ -27,9 +27,14 @@ class App extends React.Component
         <header className="App-header">
           <div className="App-title">
             <img src={logo} className="App-logo" alt="logo" />
-            <span className="punkTEX">
-              <span className="punkTEX-punk">punk</span>
-              <span className="punkTEX-TEX">T<span className="punkTEX-E">E</span>X</span>
+            <span className="punkTeX">
+              <span className="punkTeX-punk">
+                <span className="punkTeX-p">p</span>
+                <span className="punkTeX-u">u</span>
+                <span className="punkTeX-n">n</span>
+                <span className="punkTeX-k">k</span>
+              </span>
+              <span className="TeX">T<span className="TeX-e">E</span>X</span>
             </span>
             <span>v0.1-beta</span>
           </div>

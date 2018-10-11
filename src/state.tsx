@@ -9,7 +9,7 @@ extends EventTarget<State.Event>
 {
     tabs: (typeof Tab)[];
     content: string;
-    references: Reference.Params[];
+    references: Map<string, Reference.Params>;
 }
 
 export namespace State

@@ -1,9 +1,9 @@
 import Reference from './Reference';
 
-const params: Reference.Params[] =
-[
+const params: Map<string, Reference.Params> =
+new Map([
 
-    {
+    ['mljs-lm', {
         id: 'mljs-lm',
         title: 'GitHub',
         partTitle: 'Levenberg-marquardt',
@@ -21,9 +21,9 @@ const params: Reference.Params[] =
         referenced: new Date('2018-09-10'),
         online: true,
         url: new URL("https://github.com/mljs/levenberg-marquardt")
-    },
+    }],
 
-    {
+    ['recipes-fortran-77', {
         id: 'recipes-fortran-77',
         title: 'Numerical Recipes in Fortran 77',
         subtitle: 'The Art of Scientific Computing',
@@ -39,8 +39,8 @@ const params: Reference.Params[] =
         datePublished: '1992',
         identifier: "ISBN 05-214-3064-X",
         url: new URL("https://websites.pmc.ucsc.edu/~fnimmo/eart290c_17/NumericalRecipesinF77.pdf")
-    }
+    }]
 
-];
+]);
 
 export default params;

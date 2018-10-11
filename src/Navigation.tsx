@@ -86,7 +86,7 @@ class Navigation extends React.Component<Navigation.Props>
                 else if (col === l-1) Caret = FaCaretRight;
                 else                  Caret = FaCaretDown;
                 
-                buttons[col] = <button onClick={this.clickCallback(tab, col)}><Caret /></button>
+                buttons[col] = <button key={col} onClick={this.clickCallback(tab, col)}><Caret /></button>
             }
 
             entries.push(
