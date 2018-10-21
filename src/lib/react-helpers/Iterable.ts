@@ -21,16 +21,16 @@ namespace IterableHelpers
         while (!next.done)
         {
             const control = fn(next.value, forOf.Control);
-    
+
             if (control === forOf.Control.Break)
             {
                 break;
             }
-    
+
             next = iterator.next();
         }
     }
-    
+
     export namespace forOf
     {
         /**
@@ -43,7 +43,7 @@ namespace IterableHelpers
             Break
         }
     }
-    
+
 
 
     /**
@@ -65,7 +65,7 @@ namespace IterableHelpers
             {
                 yield next.value;
             }
-    
+
             next = iterator.next();
         }
     }
@@ -159,7 +159,7 @@ namespace IterableHelpers
             {
                 return true;
             }
-    
+
             next = iterator.next();
         }
 
@@ -181,7 +181,7 @@ namespace IterableHelpers
 
 
 
-    /** 
+    /**
      * Returns a new `Iterable` with each element replaced by its callback output.
      * The callback is called with the lazy evaluation strategy.
      */
@@ -199,7 +199,7 @@ namespace IterableHelpers
             yield fn(next.value);
             next = iterator.next();
         }
-    
+
         next = iterator.next();
     }
 
@@ -207,7 +207,7 @@ namespace IterableHelpers
 
     /**
      * Pushes all elements of the iterable into a new array and returns it.
-     */    
+     */
     export function toArray<T>(
         iterable: Iterable<T>
     )

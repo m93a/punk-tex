@@ -100,14 +100,14 @@ export function renderAsInlineToken(state: MD.StateInline, node: React.ReactNode
             }
 
             return;
-            
+
         }
         else if (RH.isElementOf(node, React.Component))
         {
             const component = new node.type(node.props);
             callOrNot(component.componentWillMount);
             callOrNot(component.componentDidMount);
-            
+
             renderAsInlineToken(state, component.render());
 
             callOrNot(component.componentWillUnmount);

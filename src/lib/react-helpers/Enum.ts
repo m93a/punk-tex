@@ -49,7 +49,7 @@ auto-increment the rest.
 */
 
 
-    
+
 
 
 // Helper function for devs
@@ -60,7 +60,7 @@ function getValueRepresentation(value: any): string
     {
         case 'string':
             return JSON.stringify(value).slice(1, -1);
-        
+
         case 'number':
         case 'boolean':
         case 'symbol':
@@ -195,7 +195,7 @@ namespace Enum
         }
     }
 
-    
+
     /**
      * Checks whether every value of the enum maps back to its key.
      * Call this function *right after* the delcaration of enum
@@ -286,7 +286,7 @@ namespace Enum
         {
             throw assertIsFinalized(enumObject);
         }
-        
+
         return enumObject[KeySet].size === enumObject[ReverseMap].size;
     }
 }

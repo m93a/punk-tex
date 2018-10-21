@@ -1,10 +1,11 @@
 import * as React from 'react';
 import * as Class from './Class';
 
-import * as REL from './ReactEnumeratedLists';
+import * as REL from './React.EnumeratedLists';
 
 
-export * from './ReactEnumeratedLists';
+export * from './React.EnumeratedLists';
+export { default as LambdaCache } from './React.LambdaCache';
 
 
 type ValidElement = React.ReactElement<{ children?: React.ReactNode }>;
@@ -113,7 +114,7 @@ export {baseAddClassName as addClassName};
 
 
 
-export namespace Children 
+export namespace Children
 {
     export const map = React.Children.map;
     export const forEach = React.Children.forEach;
@@ -287,7 +288,7 @@ export namespace Descendants
         Descendants.forEach(children, (ch) => arr.push(ch));
         return arr;
     }
-    
+
     export function some(children: React.ReactNode, fn: (child: React.ReactChild, index: number) => boolean): boolean
     {
         let result = false;

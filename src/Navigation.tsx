@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { FaCaretLeft, FaCaretDown, FaCaretRight } from 'react-icons/fa';
+import { LambdaCache } from './lib/react-helpers';
 import { State } from './state';
 import Tab from './tab';
 
@@ -22,8 +23,7 @@ class Navigation extends React.Component<Navigation.Props>
      * I'll save the callbacks for the click event for specific buttons here, so
      * that I pass the same lambdas to React once I create them.
      */
-    private callbackCache = new Map<typeof Tab, Map<number, () => void>>();
-    private universalCallback = this.props.onTabClick;
+    private cacheOrRetrieve = LambdaCache();
 
     /**
      * Factory for callback functions
@@ -32,41 +32,18 @@ class Navigation extends React.Component<Navigation.Props>
     {
         const state = this.props.state;
 
-        const changeTab = () =>
+        const callback = () =>
         {
+            // If there's a React-style event listener, call it
+            this.props.onTabClick
+            && this.props.onTabClick(col, tab);
+
+            // Change the tab
             state.tabs[col] = tab;
             state.dispatchEvent(State.Event.TabChange, { source: this });
         }
 
-
-        if (this.universalCallback !== this.props.onTabClick)
-        {
-            this.universalCallback = this.props.onTabClick;
-            this.callbackCache = new Map();
-        }
-
-        const fn = this.universalCallback || (() => void 0);
-        let submap = this.callbackCache.get(tab);
-
-        if (!submap)
-        {
-            submap = new Map();
-            this.callbackCache.set(tab, submap);
-        }
-
-        let callback = submap.get(col);
-
-        if (!callback)
-        {
-            callback = () =>
-            {
-                fn(col, tab);
-                changeTab();
-            }
-            submap.set(col, callback);
-        }
-
-        return callback;
+        return this.cacheOrRetrieve(tab, col, callback);
     }
 
     public render()
@@ -80,12 +57,12 @@ class Navigation extends React.Component<Navigation.Props>
 
             for (let col = 0; col < l; col++)
             {
-                let Caret; 
+                let Caret;
 
                 if (col === 0)        Caret = FaCaretLeft;
                 else if (col === l-1) Caret = FaCaretRight;
                 else                  Caret = FaCaretDown;
-                
+
                 buttons[col] = <button key={col} onClick={this.clickCallback(tab, col)}><Caret /></button>
             }
 
@@ -96,7 +73,7 @@ class Navigation extends React.Component<Navigation.Props>
                 </div>
             );
         }
-        
+
         return <nav className="App-navigation">{entries}</nav>;
     }
 }

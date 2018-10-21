@@ -33,9 +33,9 @@ export default function inlineCommandRuleFactory(
             pos++;
             if (pos > max) return false;
         }
-        
+
         const content = state.src.slice(start, pos);
-        
+
 
         if (!silent)
         {
@@ -44,6 +44,6 @@ export default function inlineCommandRuleFactory(
 
         state.pos = ++pos;
         return true;
-        
+
     };
 }

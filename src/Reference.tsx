@@ -14,7 +14,7 @@ class Reference extends React.Component<Reference.Props>
             throw new Error('The chosen format is yet to be implemented.');
         }
 
-        
+
 
         // Authors
 
@@ -118,7 +118,7 @@ class Reference extends React.Component<Reference.Props>
             }
         }
 
-        
+
 
         // Edition
 
@@ -243,6 +243,28 @@ namespace Reference
         online?: boolean;
         referenced?: Date;
     }
+
+    export const Params: Required<Params> =
+    {
+        id: '',
+        title: '',
+        subtitle: '',
+        partTitle: '',
+        partSubtitle: '',
+        authors: {
+            names: [],
+            etAl: false
+        },
+
+        datePublished: '',
+        placePublished: '',
+        edition: '',
+
+        identifier: '',
+        url: new URL('http://mff.cuni.cz'),
+        online: false,
+        referenced: new Date()
+    };
 
     export interface Props extends Params
     {

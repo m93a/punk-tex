@@ -11,10 +11,27 @@ export function hasOwnProperty (obj: object, prop: PropertyKey)
 
 
 export function callOrNot<R = any, T extends Array<any> = Array<any>>(fn: (...args: T) => R, ...args: T): R;
-export function callOrNot<R = any, T extends Array<any> = Array<any>>(fn: undefined | ((...args: T) => R), ...args: T): R | undefined;
+export function callOrNot<R = any, T extends Array<any> = Array<any>>(fn: undefined | ((...args: T) => R), ...args: T): R|undefined;
 export function callOrNot<R = any, T extends Array<any> = Array<any>>(fn?: (...args: T) => R, ...args: T)
 {
     return fn ? fn(...args) : undefined;
+}
+
+
+const objectHashes = new WeakMap<object, number>();
+let currentHash = Math.round(Number.MAX_SAFE_INTEGER * Math.random());
+
+export function hashObject(obj: object)
+{
+    const hash = objectHashes.get(obj);
+    if (hash !== undefined) return hash;
+
+    currentHash += 1;
+    if (currentHash > Number.MAX_SAFE_INTEGER) currentHash = 1;
+
+    objectHashes.set(obj, currentHash);
+
+    return currentHash;
 }
 
 
@@ -65,7 +82,7 @@ export function isSubclassOf<T extends Ctor>(subclass: Ctor, parent: T): subclas
     {
         throw new TypeError('One of the arguments was not a constructor.');
     }
-    
+
     function isSubprototype(subproto: Constructor.Prototype): boolean
     {
         if (subproto === parent.prototype || subproto instanceof parent)
@@ -74,18 +91,18 @@ export function isSubclassOf<T extends Ctor>(subclass: Ctor, parent: T): subclas
         }
 
         const mixins = subclass.prototype[MixinSet];
-        
+
         if (mixins instanceof Set)
         {
             return Iterables.some(mixins, (subsub) => isSubprototype(subsub));
         }
-        
+
 
         return false;
     }
 
     return isSubprototype(subclass.prototype);
-    
+
 }
 
 
@@ -170,7 +187,7 @@ class Vertex<T>
         {
             throw new TypeError('This Vertex already has a parent.');
         }
-        
+
 
         parent.tree.roots.delete(this);
         parent.children.add(this);
@@ -225,7 +242,7 @@ function createPrototypeTree(obj: object, ...objs: object[]): Tree<object>
     objs.push(obj);
     const tree = new Tree<object>();
 
-    
+
     objs.forEach( (c: object|null) =>
     {
         let v = tree.createVertex(c as object);
@@ -253,7 +270,7 @@ function createPrototypeTree(obj: object, ...objs: object[]): Tree<object>
             }
         }
     });
-    
+
 
     return tree;
 }
@@ -339,7 +356,7 @@ function produceMixinPrototype(derived: object, bases: object[]): object
         while (proto = Object.getPrototypeOf(proto) as object|null);
     }
 
-    
+
 
     // Create an universal root, so that even completely disjunct prototype
     // chains have a common node. Add it to the end of spineNodes.
@@ -383,7 +400,7 @@ function produceMixinPrototype(derived: object, bases: object[]): object
             {
                 return;
             }
-            
+
             // reduce c and its children into a single node
             mergeDerivedObjects(c);
 
@@ -398,7 +415,7 @@ function produceMixinPrototype(derived: object, bases: object[]): object
         });
     }
 
-    
+
     // Now mixinPrototype is cool and good 👌
     return mixinPrototype;
 }
@@ -443,7 +460,7 @@ export function applyMixins(derivedCtor: Ctor, baseCtors: Ctor[]): void
     }
 
     // derivedCtor is not yet a mixin
-    else 
+    else
     {
         mixinSet = derivedCtor.prototype[MixinSet] = new Set();
     }

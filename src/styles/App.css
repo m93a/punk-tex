@@ -74,6 +74,10 @@
 
 
 
+html, body, #root, .App {
+  height: 100%;
+}
+
 .App {
   text-align: center;
 }
@@ -140,6 +144,7 @@
 }
 
 .App-intro {
+  height: calc(100% - 190px);
   font-size: large;
   display: flex;
   flex-direction: row;
@@ -155,8 +160,16 @@
   to { transform: rotate(360deg); }
 }
 
-#editor {
+.editor {
   font-size: 16px;
+}
+
+.ref-body, .ref-edit {
+  padding-bottom: 2em;
+}
+
+.ref-body *|*.icon {
+  cursor: pointer;
 }
 
 
@@ -193,8 +206,13 @@
 .render-target {
   padding-left: 20px;
   font-family: "CMU Serif";
+  overflow-y: scroll;
 }
 
 .render-target .error {
   background: yellow;
+}
+
+.render-target pre {
+  white-space: pre-wrap;
 }

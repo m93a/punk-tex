@@ -1,10 +1,11 @@
 import * as React from 'react';
 
 import Tab from '.';
-import { State } from '../state';
+import { State, state } from '../state';
 import Event from '../lib/react-helpers/Event';
 
 import Ace from 'react-ace';
+import { Ace as AceTypes } from 'ace-builds';
 import 'brace/mode/markdown';
 import '../theme';
 
@@ -12,16 +13,34 @@ export default class Editor extends Tab
 {
     public static get title() { return 'Editor' };
 
+    public editor: AceTypes.Editor;
+    public cursorPosition: AceTypes.Point = {row: 0, column: 0};
+
     public render()
     {
         return <Ace
             mode="markdown"
             theme="decent"
+            className="editor"
+            fontSize={16}
+            ref={this.mainControl}
             onChange={this.onInternalChange}
-            name="editor"
-            editorProps={{$blockScrolling: true}}
+            editorProps={{$blockScrolling: false}}
+            wrapEnabled
+            height="100%"
             value={this.props.state.content}
         />;
+    }
+
+    public mainControl = (instance: Ace) =>
+    {
+        const editor = this.editor = (instance as any).editor as AceTypes.Editor;
+
+        editor.selection.on('changeCursor', () =>
+        {
+            state.cursor = editor.getCursorPosition();
+            state.cursorOnScreen = editor.getCursorPositionScreen();
+        });
     }
 
     public onInternalChange = (content: string) =>

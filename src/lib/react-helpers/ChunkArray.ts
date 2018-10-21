@@ -26,8 +26,8 @@ export default class ChunkArray<T> implements Iterable<T>
     {
         this.chunkLength = Math.abs(chunkLength || 1000) | 0;
     }
-    
-    
+
+
     public getItem(index: number)
     {
         const sub = index % this.chunkLength;
@@ -40,7 +40,7 @@ export default class ChunkArray<T> implements Iterable<T>
 
         return this.storage[sup][sub];
     }
-    
+
     public setItem(index: number, value: T)
     {
         const sub = index % this.chunkLength;
@@ -58,7 +58,7 @@ export default class ChunkArray<T> implements Iterable<T>
     {
         return this.getItem(index) !== undefined;
     }
-    
+
 
     public deleteChunk(chunkIndex: number)
     {
@@ -109,7 +109,7 @@ export default class ChunkArray<T> implements Iterable<T>
             }
             arr.push(item);
         }
-        
+
         throw new Error('Not implemented.'); // TODO
     }
 

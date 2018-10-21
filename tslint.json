@@ -10,6 +10,7 @@
   },
   "rules": {
     "jsx-boolean-value": [ true, "never" ],
+    "no-trailing-whitespace": true,
 
     "no-empty": false,
     "no-bitwise": false,
