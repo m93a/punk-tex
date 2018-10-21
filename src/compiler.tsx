@@ -6,49 +6,51 @@ import * as TexZilla from 'texzilla';
 import mdMath from 'markdown-it-math';
 import mdReplace from 'markdown-it-replacements';
 
-import state from './state';
-import references from './compiler-extensions/references';
+import { state, State } from './state';
+import references from './compiler-extensions/cite';
 import punktex from './compiler-extensions/punktex';
 
 const md = MarkdownIt({
-  breaks: false,
-  html: true,
-  quotes: "„“‚‘",
-  typographer: true,
-  xhtmlOut: true,
+	breaks: false,
+	html: true,
+	quotes: "„“‚‘",
+	typographer: true,
+	xhtmlOut: true,
 });
 
 md.use(
-  mdIncrementalDOM,
-  IncrementalDOM
+	mdIncrementalDOM,
+	IncrementalDOM
 );
 
 md.use(
-  mdMath,
-  {
-    inlineRenderer(str: string) {
-        return TexZilla.toMathMLString(str);
-    },
-    blockRenderer(str: string) {
-        return TexZilla.toMathMLString(str, true);
-    }
-  }
+	mdMath,
+	{
+		inlineRenderer(str: string) {
+			const result = TexZilla.toMathMLString(str);
+			console.log(result);
+			return result;
+		},
+		blockRenderer(str: string) {
+			return TexZilla.toMathMLString(str, true);
+		}
+	}
 );
 
 [
-  ['copyright', '©'],
-  ['registered', '®'],
-  ['tm', '™'],
-  ['S', '§'],
-  ['dag', '†']
+	['copyright', '©'],
+	['registered', '®'],
+	['tm', '™'],
+	['S', '§'],
+	['dag', '†']
 ]
 .forEach( entry =>
-  mdReplace.replacements.push({
-    default: true,
-    name: entry[0],
-    re: RegExp('\\\\' + entry[0], 'g'),
-    sub(s: string) { return entry[1]; },
-  })
+	mdReplace.replacements.push({
+		default: true,
+		name: entry[0],
+		re: RegExp('\\\\' + entry[0], 'g'),
+		sub(s: string) { return entry[1]; },
+	})
 );
 
 md.use(mdReplace);
@@ -59,10 +61,20 @@ md.use(punktex);
 
 export function renderToElement(id: string, code: string)
 {
-    const target = document.getElementById(id);
-    const content = md.renderToIncrementalDOM(code);
-
+	const target = document.getElementById(id);
     if (!target) throw Error("Couldn't find element with id: " + id);
 
-    IncrementalDOM.patch(target, content);
+
+	let content: (...p: any[]) => void;
+
+	try
+	{
+		content = md.renderToIncrementalDOM(code);
+		IncrementalDOM.patch(target, content);
+	}
+	catch(e)
+	{
+		console.error('Compilation error: ', e);
+		return state.dispatchEvent(State.Event.CompilationError);
+	}
 }

@@ -103,6 +103,4 @@ export default function insertPlugin(md: MarkdownIt, appState: State)
 
     md.inline.ruler.after('image',    'amp-cite',       rule_cite);
     md.inline.ruler.after('amp-cite', 'amp-references', rule_references);
-
-    console.log(md.inline.ruler);
 };

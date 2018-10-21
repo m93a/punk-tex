@@ -34,6 +34,8 @@ export default class Editor extends Tab
 
     public mainControl = (instance: Ace) =>
     {
+        if (!instance) return;
+
         const editor = this.editor = (instance as any).editor as AceTypes.Editor;
 
         editor.selection.on('changeCursor', () =>

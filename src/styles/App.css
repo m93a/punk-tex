@@ -164,12 +164,22 @@ html, body, #root, .App {
   font-size: 16px;
 }
 
-.ref-body, .ref-edit {
+.ref-body, .ref-edit, .ref-new {
   padding-bottom: 2em;
 }
 
-.ref-body *|*.icon {
+.ref-edit-title {
+  font-weight: bold;
+}
+
+*|*.icon.button {
   cursor: pointer;
+  margin-right: 0.5em;
+}
+
+input:invalid,
+input:focus:invalid {
+  outline: rgb(255, 72, 52) solid 1px;
 }
 
 
@@ -215,4 +225,8 @@ html, body, #root, .App {
 
 .render-target pre {
   white-space: pre-wrap;
+}
+
+.render-target m|merror {
+  font-family: monospace;
 }

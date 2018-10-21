@@ -15,6 +15,11 @@ Tohle je vědecká práce&cite(mljs-lm). Fortran smrdí&cite(recipes-fortran-77)
 
 3. Zobrazte na osciloskopu V–A charakteristiku vakuové diody EZ81 a Zenerovy diody KZ703 podle schématu připojeného k úloze. Orientačně načrtněte pozorované charakteristiky a vyznačte měřítka na osách. Odhadněte napětí na diodách při proudu 20 mA v propustném směru. Určete Zenerovo napětí.
 
+# Výsledky měření
+<div style="text-align: center">
+    <img src="https://i.imgur.com/aWTSfn8.png" />
+</div>
+
 
 # Závěr
 K sázení textu nebyl použit &latex() -- tento dokument byl vytvořen v programu &punktex().

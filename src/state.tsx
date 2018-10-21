@@ -38,7 +38,8 @@ export namespace State
         ContentChange = 'contentchange',
         TabChange = 'tabchange',
         ReferencesChange = 'referenceschange',
-        LanguageChange = 'languagechange'
+        LanguageChange = 'languagechange',
+        CompilationError = 'compilationerror'
     }
 }
 

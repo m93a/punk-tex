@@ -64,9 +64,12 @@ class Reference extends React.Component<Reference.Props>
 
         let authors = authorsArr.join(' ').trim();
 
-        if (authors[authors.length - 1] !== '.') authors += '.';
+        if (authors)
+        {
+            if (authors[authors.length - 1] !== '.') authors += '.';
 
-        authors += ' ';
+            authors += ' ';
+        }
 
 
 
