@@ -1,6 +1,9 @@
 # punk-tex
 The fuck'em-all alternative to traditional typesetting systems
 
+## Try online
+You can try a [live demo](http://punktex.g6.cz/) of punkTex.
+
 ## How to download, build and run
 ```
 git clone https://github.com/m93a/punk-tex

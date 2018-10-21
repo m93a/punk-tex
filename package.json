@@ -1,6 +1,6 @@
 {
   "name": "punk-tex",
-  "version": "0.1.0",
+  "version": "0.1.0-beta",
   "private": true,
   "dependencies": {
     "ace-builds": "^1.4.1",

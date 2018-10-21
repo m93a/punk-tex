@@ -20,6 +20,15 @@ Tohle je vědecká práce&cite(mljs-lm). Fortran smrdí&cite(recipes-fortran-77)
     <img src="https://i.imgur.com/aWTSfn8.png" />
 </div>
 
+Naměřil jsem nějakou hodnotu, ale nevím, co to znamená.
+$$$
+\\sqrt{\\frac{k}{m}} =
+\\left( 5.4568 \\pm 0.0001 \\right)
+\\mtext{ } \\mathrm{ N^½ }
+\\mtext{ } \\mathrm{ m^{-½} }
+\\mtext{ } \\mathrm{ kg^{-½} }
+$$$
+
 
 # Závěr
 K sázení textu nebyl použit &latex() -- tento dokument byl vytvořen v programu &punktex().
