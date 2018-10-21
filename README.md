@@ -1,6 +1,5 @@
 # punk-tex
 The fuck'em-all alternative to traditional typesetting systems
-<!-- wtf I can't push to GitHub? -->
 
 ## Try online
 You can try a [live demo](http://punktex.g6.cz/) of punkTex.
