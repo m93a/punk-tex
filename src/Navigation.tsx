@@ -1,16 +1,28 @@
 import * as React from 'react';
-import { FaCaretLeft, FaCaretDown, FaCaretRight } from 'react-icons/fa';
 import { LambdaCache } from './lib/react-helpers';
 import { State } from './state';
 import * as Material from '@material-ui/core';
 
-import Tab from './tab';
+import { default as Tab, available } from './tab';
+
+const styles = (theme: Material.Theme) => Material.createStyles({
+    drawerPaper: {
+      width: 240,
+      [theme.breakpoints.up('md')]: {
+        position: 'relative',
+      },
+    },
+});
 
 
 namespace Navigation
 {
     export interface Props
+    extends Material.WithStyles<typeof styles>
     {
+        open?: boolean;
+        toggleNav?(): void;
+
         state: State,
         columns: number,
         onTabClick?: (col: number, tab: typeof Tab) => void
@@ -29,6 +41,7 @@ class Navigation extends React.Component<Navigation.Props>
     /**
      * Factory for callback functions
      */
+    // @ts-ignore
     private clickCallback(tab: typeof Tab, col: number)
     {
         const state = this.props.state;
@@ -51,8 +64,9 @@ class Navigation extends React.Component<Navigation.Props>
     {
         const entries: React.ReactChild[] = [];
 
-        for (const tab of [] as any[])
+        for (const tab of available)
         {
+<<<<<<< HEAD
             const buttons: React.ReactChild[] = [];
             const l = this.props.columns;
 
@@ -67,19 +81,28 @@ class Navigation extends React.Component<Navigation.Props>
                 buttons[col] = <button key={col} onClick={this.clickCallback(tab, col)}><Caret /></button>
             }
 
+=======
+>>>>>>> 2d33c15... Header and nav drawer implementation, tab listing and icons
             entries.push(
-                <div key={tab.title} className="App-tab-button">
-                    <span className="title">{tab.title}</span>
-                    {buttons}
-                </div>
+                <Material.ListItem key={tab.title} button>
+                    <Material.ListItemIcon><tab.icon/></Material.ListItemIcon>
+                    <Material.ListItemText>{tab.title}</Material.ListItemText>
+                </Material.ListItem>
             );
         }
         return (
-            <Material.Toolbar>
-            asd
-            </Material.Toolbar>
+            <Material.Drawer
+                open={this.props.open}
+                variant='temporary'
+                classes={{ paper: this.props.classes.drawerPaper }}
+                onClose={this.props.toggleNav}
+            >
+                <Material.List>
+                {entries}
+                </Material.List>
+            </Material.Drawer>
         );
     }
 }
 
-export default Navigation;
+export default Material.withStyles(styles)(Navigation);

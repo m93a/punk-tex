@@ -5,17 +5,32 @@ import state, { State } from './state';
 
 import * as Tabs     from './tab';
 import Header from './Header';
+import Navigation from './Navigation';
 
 state.tabs = [Tabs.Editor, Tabs.Preview];
 
-class App extends React.Component
+class App extends React.Component<{}, App.AppState>
 {
+  public state = {
+    navOpen: false,
+  } as App.AppState;
+
+  private toggleNav = () => {
+    this.setState({ navOpen: !this.state.navOpen });
+  }
+
   public render()
   {
     // <Navigation/>
     return (
       <div className="App">
-        <Header/>
+        <Header toggleNav={this.toggleNav}/>
+        <Navigation 
+          state={state}
+          columns={2}
+          open={this.state.navOpen}
+          toggleNav={this.toggleNav}
+        />
         <div className="App-intro">
           {
             state.tabs.map( (T, i) => <T key={i} state={state} />)
@@ -40,6 +55,12 @@ class App extends React.Component
     state.removeEventListener(State.Event.TabChange, this.update);
   }
 
+}
+
+namespace App {
+  export interface AppState {
+    navOpen: boolean;
+  }
 }
 
 export default App;

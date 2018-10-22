@@ -4,9 +4,12 @@ import Tab from './Tab';
 import { State } from '../state';
 import { renderToElement } from '../compiler';
 
+import Image from '@material-ui/icons/Image';
+
 export default class Preview extends Tab
 {
     public static get title() { return 'Preview' };
+    public static get icon() { return Image };
 
     public id = 'render-target';
 

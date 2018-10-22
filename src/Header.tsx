@@ -4,6 +4,7 @@ import * as Material from '@material-ui/core';
 // Icons
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import Add from '@material-ui/icons/Add';
 
 class Header
 extends React.Component<Header.Props, Header.State> {
@@ -20,6 +21,7 @@ extends React.Component<Header.Props, Header.State> {
                             marginLeft: -12,
                             marginRight: 20,
                         }}
+                        onClick={this.props.toggleNav}
                     >
                         <MenuIcon/>
                     </Material.IconButton>
@@ -36,6 +38,9 @@ extends React.Component<Header.Props, Header.State> {
                         <span className="TeX">T<span className="TeX-e">E</span>X</span>
                     </Material.Typography>
                     <Material.IconButton color='inherit'>
+                        <Add/>
+                    </Material.IconButton>
+                    <Material.IconButton color='inherit'>
                         <AccountCircle/>
                     </Material.IconButton>
                 </Material.Toolbar>
@@ -46,7 +51,7 @@ extends React.Component<Header.Props, Header.State> {
 
 namespace Header {
     export interface Props {
-
+        toggleNav?(): void;
     }
 
     export interface State {

@@ -19,6 +19,7 @@ import { Ω } from '../lang';
 
 // Utilities
 import { Required_ish, Event, Iterable, LambdaCache, hashObject } from "../lib/react-helpers";
+import FormatQuote from '@material-ui/icons/FormatQuote';
 
 // Resources
 import
@@ -48,10 +49,6 @@ const formatDate = (d: Date) => pad(d.getFullYear(), 4) + '-' + pad(d.getMonth()
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type FocusEvent = React.FocusEvent<HTMLInputElement>;
 type ø<T> = T | undefined;
-
-// #endregion
-
-
 
 
 /* * *
@@ -491,6 +488,7 @@ extends React.Component<ButtonProps>
 class ReferenceManager extends Tab
 {
     public static get title() { return 'References'; }
+    public static get icon() { return FormatQuote; }
 
     public cacheOrRetrieve = LambdaCache();
 

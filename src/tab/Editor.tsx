@@ -9,9 +9,12 @@ import { Ace as AceTypes } from 'ace-builds';
 import 'brace/mode/markdown';
 import '../theme';
 
+import Edit from '@material-ui/icons/Edit';
+
 export default class Editor extends Tab
 {
     public static get title() { return 'Editor' };
+    public static get icon() { return Edit };
 
     public editor?: AceTypes.Editor;
     public cursorPosition: AceTypes.Point = {row: 0, column: 0};
