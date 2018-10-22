@@ -9,10 +9,12 @@
 import * as React from 'react';
 import ui, { editable, rendererArray, staticRender } from '../lib/ui-decorators';
 
-// Local functions
-import Tab from '.';
+
+import Tab from './Tab';
+import { State, state } from '../state';
+import Event from '../lib/react-helpers/Event';
+
 import Reference from '../structures/Reference';
-import { state, State } from '../state';
 import { Ω } from '../lang';
 
 // Utilities

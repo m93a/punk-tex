@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import Tab from '.';
+import Tab from './Tab';
 import { State } from '../state';
 import { renderToElement } from '../compiler';
 
