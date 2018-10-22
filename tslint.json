@@ -29,6 +29,7 @@
     "no-unused-expression": false,
     "no-namespace": false,
     "no-empty-interface": false,
+    "no-string-literal": false,
 
     "interface-name": false,
     "variable-name": false,

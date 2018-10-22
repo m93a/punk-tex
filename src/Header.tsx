@@ -5,9 +5,31 @@ import * as Material from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Add from '@material-ui/icons/Add';
+import { Logo } from './components';
 
 class Header
 extends React.Component<Header.Props, Header.State> {
+    public state = {
+        isOpen: {
+            'add':  undefined,
+            'user': undefined,
+        }
+    };
+
+    private openMenu = (menu: string) => {
+        return (e: React.MouseEvent<HTMLElement>) => {
+            this.state.isOpen[menu] = e.currentTarget;
+            this.forceUpdate();
+        };
+    }
+
+    private closeMenu = (menu: string) => {
+        return (e: React.MouseEvent<HTMLElement>) => {
+            this.state.isOpen[menu] = undefined;
+            this.forceUpdate();
+        };
+    }
+
     public render() {
         return (
             <Material.AppBar position='relative'>
@@ -26,20 +48,38 @@ extends React.Component<Header.Props, Header.State> {
                         textAlign: 'left',
                         flexGrow: 1,
                     }}>
-                        <span className="punkTeX-punk">
-                            <span className="punkTeX-p">p</span>
-                            <span className="punkTeX-u">u</span>
-                            <span className="punkTeX-n">n</span>
-                            <span className="punkTeX-k">k</span>
-                        </span>
-                        <span className="TeX">T<span className="TeX-e">E</span>X</span>
+                        <Logo/>
                     </Material.Typography>
-                    <Material.IconButton color='inherit'>
-                        <Add/>
-                    </Material.IconButton>
-                    <Material.IconButton color='inherit'>
-                        <AccountCircle/>
-                    </Material.IconButton>
+                    <div>
+                        <Material.IconButton
+                            color='inherit'
+                            onClick={this.openMenu('add')}
+                        >
+                            <Add/>
+                        </Material.IconButton>
+                        <Material.Menu
+                            open={Boolean(this.state.isOpen['add'])}
+                            anchorEl={this.state.isOpen['add']}
+                            onClose={this.closeMenu('add')}
+                        >
+                            <Material.MenuItem>New project</Material.MenuItem>
+                        </Material.Menu>
+                    </div>
+                    <div>
+                        <Material.IconButton
+                            color='inherit'
+                            onClick={this.openMenu('user')}
+                        >
+                            <AccountCircle/>
+                        </Material.IconButton>
+                        <Material.Menu
+                            open={Boolean(this.state.isOpen['user'])}
+                            anchorEl={this.state.isOpen['user']}
+                            onClose={this.closeMenu('user')}
+                        >
+                            <Material.MenuItem>Login</Material.MenuItem>
+                        </Material.Menu>
+                    </div>
                 </Material.Toolbar>
             </Material.AppBar>
         )
@@ -52,7 +92,9 @@ namespace Header {
     }
 
     export interface State {
-
+        isOpen: {
+            [menu: string]: Element | undefined;
+        };
     }
 }
 
