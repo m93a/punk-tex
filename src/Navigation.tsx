@@ -66,23 +66,6 @@ class Navigation extends React.Component<Navigation.Props>
 
         for (const tab of available)
         {
-<<<<<<< HEAD
-            const buttons: React.ReactChild[] = [];
-            const l = this.props.columns;
-
-            for (let col = 0; col < l; col++)
-            {
-                let Caret;
-
-                if (col === 0)        Caret = FaCaretLeft;
-                else if (col === l-1) Caret = FaCaretRight;
-                else                  Caret = FaCaretDown;
-
-                buttons[col] = <button key={col} onClick={this.clickCallback(tab, col)}><Caret /></button>
-            }
-
-=======
->>>>>>> 2d33c15... Header and nav drawer implementation, tab listing and icons
             entries.push(
                 <Material.ListItem key={tab.title} button>
                     <Material.ListItemIcon><tab.icon/></Material.ListItemIcon>

@@ -9,13 +9,10 @@ import Add from '@material-ui/icons/Add';
 class Header
 extends React.Component<Header.Props, Header.State> {
     public render() {
-        // logo
-        
-
         return (
             <Material.AppBar position='relative'>
                 <Material.Toolbar>
-                    <Material.IconButton 
+                    <Material.IconButton
                         color='inherit'
                         style={{
                             marginLeft: -12,

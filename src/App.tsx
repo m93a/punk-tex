@@ -25,7 +25,7 @@ class App extends React.Component<{}, App.AppState>
     return (
       <div className="App">
         <Header toggleNav={this.toggleNav}/>
-        <Navigation 
+        <Navigation
           state={state}
           columns={2}
           open={this.state.navOpen}
