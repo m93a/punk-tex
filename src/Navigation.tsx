@@ -2,6 +2,8 @@ import * as React from 'react';
 import { FaCaretLeft, FaCaretDown, FaCaretRight } from 'react-icons/fa';
 import { LambdaCache } from './lib/react-helpers';
 import { State } from './state';
+import * as Material from '@material-ui/core';
+
 import Tab from './tab';
 
 
@@ -9,7 +11,6 @@ namespace Navigation
 {
     export interface Props
     {
-        tabs: (typeof Tab)[];
         state: State,
         columns: number,
         onTabClick?: (col: number, tab: typeof Tab) => void
@@ -50,7 +51,7 @@ class Navigation extends React.Component<Navigation.Props>
     {
         const entries: React.ReactChild[] = [];
 
-        for (const tab of this.props.tabs)
+        for (const tab of [] as any[])
         {
             const buttons: React.ReactChild[] = [];
             const l = this.props.columns;
@@ -73,8 +74,11 @@ class Navigation extends React.Component<Navigation.Props>
                 </div>
             );
         }
-
-        return <nav className="App-navigation">{entries}</nav>;
+        return (
+            <Material.Toolbar>
+            asd
+            </Material.Toolbar>
+        );
     }
 }
 
