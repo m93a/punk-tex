@@ -1,6 +1,10 @@
 import * as React from 'react';
 import * as Material from '@material-ui/core';
 
+// Icons
+import MenuIcon from '@material-ui/icons/Menu';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+
 class Header
 extends React.Component<Header.Props, Header.State> {
     public render() {
@@ -8,9 +12,21 @@ extends React.Component<Header.Props, Header.State> {
         
 
         return (
-            <Material.AppBar>
+            <Material.AppBar position='relative'>
                 <Material.Toolbar>
-                    <span className="punkTeX">
+                    <Material.IconButton 
+                        color='inherit'
+                        style={{
+                            marginLeft: -12,
+                            marginRight: 20,
+                        }}
+                    >
+                        <MenuIcon/>
+                    </Material.IconButton>
+                    <Material.Typography variant='h6' className="punkTeX" color='inherit' style={{
+                        textAlign: 'left',
+                        flexGrow: 1,
+                    }}>
                         <span className="punkTeX-punk">
                             <span className="punkTeX-p">p</span>
                             <span className="punkTeX-u">u</span>
@@ -18,7 +34,10 @@ extends React.Component<Header.Props, Header.State> {
                             <span className="punkTeX-k">k</span>
                         </span>
                         <span className="TeX">T<span className="TeX-e">E</span>X</span>
-                    </span>
+                    </Material.Typography>
+                    <Material.IconButton color='inherit'>
+                        <AccountCircle/>
+                    </Material.IconButton>
                 </Material.Toolbar>
             </Material.AppBar>
         )
