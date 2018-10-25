@@ -6,6 +6,8 @@ import state, { State } from './state';
 import * as Tabs     from './tab';
 import Header from './Header';
 import Navigation from './Navigation';
+import Session from './session';
+import NotificationManager from './NotificationManager';
 
 state.tabs = [Tabs.Editor, Tabs.Preview];
 
@@ -36,6 +38,7 @@ class App extends React.Component<{}, App.AppState>
             state.tabs.map( (T, i) => <T key={i} state={state} />)
           }
         </div>
+        <NotificationManager/>
       </div>
     );
   }
@@ -48,6 +51,7 @@ class App extends React.Component<{}, App.AppState>
   public componentDidMount()
   {
     state.addEventListener(State.Event.TabChange, this.update);
+    this.checkLogin();
   }
 
   public componentWillUnmount()
@@ -55,6 +59,22 @@ class App extends React.Component<{}, App.AppState>
     state.removeEventListener(State.Event.TabChange, this.update);
   }
 
+  private checkLogin = async () => {
+    let token = localStorage.getItem('token');
+    if (token) {
+      try {
+        token = await Session.refreshToken(token);
+        NotificationManager.push('Logged in using your previous token.');
+      } catch (err) {
+        localStorage.removeItem('token');
+        NotificationManager.push('Your previous token vas not valid.');
+        return;
+      }
+      state.token = token;
+      state.dispatchEvent(State.Event.LoginStateChange);
+      localStorage.setItem('token', token);
+    }
+  }
 }
 
 namespace App {

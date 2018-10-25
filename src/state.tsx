@@ -30,6 +30,8 @@ extends EventTarget<State.Event>
     cursor: Point;
     cursorOnScreen: Point;
 
+    token?: Token;
+
     pointToIndex(point: Point): number;
     indexToPoint(index: number): Point;
 }
@@ -42,7 +44,8 @@ export namespace State
         TabChange = 'tabchange',
         ReferencesChange = 'referenceschange',
         LanguageChange = 'languagechange',
-        CompilationError = 'compilationerror'
+        CompilationError = 'compilationerror',
+        LoginStateChange = 'loginstatechange',
     }
 }
 
