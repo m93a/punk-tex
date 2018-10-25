@@ -75,16 +75,16 @@ export default function LambdaCache()
 {
     const cache = new WeakishMultimap<unknown, callback>();
 
-    function CacheOrRetrieve<C extends callback, T>(key: T, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U>(key1: T, key2: U, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V>(key1: T, key2: U, key3: V, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V, W>(key1: T, key2: U, key3: V, key4: W, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V, W, X>(key1: T, key2: U, key3: V, key4: W, key5: X, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V, W, X, Y>(key1: T, key2: U, key3: V, key4: W, key5: X, key6: Y, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V, W, X, Y, Z>(key1: T, key2: U, key3: V, key4: W, key5: X, key6: Y, key7: Z, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V, W, X, Y, Z, Æ>(key1: T, key2: U, key3: V, key4: W, key5: X, key6: Y, key7: Z, key8: Æ, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V, W, X, Y, Z, Æ, Ø>(key1: T, key2: U, key3: V, key4: W, key5: X, key6: Y, key7: Z, key8: Æ, key9: Ø, lambda: C): C
-    function CacheOrRetrieve<C extends callback, T, U, V, W, X, Y, Z, Æ, Ø, Å>(key1: T, key2: U, key3: V, key4: W, key5: X, key6: Y, key7: Z, key8: Æ, key9: Ø, key10: Å, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, key4: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, key4: any, key5: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, key4: any, key5: any, key6: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, key4: any, key5: any, key6: any, key7: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, key4: any, key5: any, key6: any, key7: any, key8: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, key4: any, key5: any, key6: any, key7: any, key8: any, key9: any, lambda: C): C
+    function CacheOrRetrieve<C extends callback>(key1: any, key2: any, key3: any, key4: any, key5: any, key6: any, key7: any, key8: any, key9: any, key10: any, lambda: C): C
     function CacheOrRetrieve(...params: any[]): callback
 
     function CacheOrRetrieve(...keys: unknown[]): callback

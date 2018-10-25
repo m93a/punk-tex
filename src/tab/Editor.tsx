@@ -13,7 +13,7 @@ export default class Editor extends Tab
 {
     public static get title() { return 'Editor' };
 
-    public editor: AceTypes.Editor;
+    public editor?: AceTypes.Editor;
     public cursorPosition: AceTypes.Point = {row: 0, column: 0};
 
     public render()
