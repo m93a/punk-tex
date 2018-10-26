@@ -2,11 +2,18 @@ import * as React from 'react';
 import * as Material from '@material-ui/core';
 import * as _ from 'lodash';
 
+interface NotificationAction {
+    text: string;
+    onClick?(e: React.MouseEvent<HTMLElement>): void;
+}
+
 interface Notification {
     id: string;
     text: string;
     timeout?: number;
     closing?: boolean;
+
+    action?: NotificationAction;
 }
 
 
@@ -14,12 +21,13 @@ class NotificationManager
 extends React.Component<NotificationManager.Props, NotificationManager.State> {
     private static Listeners: ((n: Notification) => void)[] = [];
 
-    public static push(text: string, timeout?: number) {
+    public static push(text: string, action?: NotificationAction, timeout?: number) {
         const id = _.uniqueId('ntf-');
         const notification = {
             id,
             text,
             timeout,
+            action
         }
         this.Listeners.forEach(l => l(notification));
     }
@@ -109,6 +117,14 @@ namespace NotificationManager {
                     message={(
                         <span>{text}</span>
                     )}
+                    action={this.props.action ? (
+                        <Material.Button
+                            onClick={this.props.action.onClick}
+                            color='secondary'
+                        >
+                        {this.props.action.text}
+                        </Material.Button>
+                    ) : undefined}
                 />
             );
         }

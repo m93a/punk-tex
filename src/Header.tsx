@@ -35,7 +35,7 @@ const styles = (theme: Material.Theme) => Material.createStyles({
     },
 });
 
-class Header
+export class Header
 extends React.Component<Header.Props, Header.State> {
     public state = {
         isOpen: {} as any,
@@ -52,6 +52,10 @@ extends React.Component<Header.Props, Header.State> {
 
     private update = () => {
         this.forceUpdate();
+    }
+
+    public openLogin = () => {
+        this.setState({ modal: 'login' });
     }
 
     private menus: Menus = {
@@ -181,7 +185,7 @@ extends React.Component<Header.Props, Header.State> {
     }
 }
 
-namespace Header {
+export namespace Header {
     export interface Props {
         toggleNav?(): void;
     }

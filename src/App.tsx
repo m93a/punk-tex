@@ -4,15 +4,16 @@ import './styles/App.css';
 import state, { State } from './state';
 
 import * as Tabs     from './tab';
-import Header from './Header';
 import Navigation from './Navigation';
 import Session from './session';
 import NotificationManager from './NotificationManager';
+import { default as Header, Header as HeaderC } from './Header';
 
 state.tabs = [Tabs.Editor, Tabs.Preview];
 
 class App extends React.Component<{}, App.AppState>
 {
+  private header: HeaderC;
   public state = {
     navOpen: false,
   } as App.AppState;
@@ -21,12 +22,16 @@ class App extends React.Component<{}, App.AppState>
     this.setState({ navOpen: !this.state.navOpen });
   }
 
+  private setHeader = (h: HeaderC) => {
+    this.header = h;
+  }
+
   public render()
   {
     // <Navigation/>
     return (
       <div className="App">
-        <Header toggleNav={this.toggleNav}/>
+        <Header toggleNav={this.toggleNav} innerRef={this.setHeader}/>
         <Navigation
           state={state}
           columns={2}
@@ -67,7 +72,12 @@ class App extends React.Component<{}, App.AppState>
         NotificationManager.push('Logged in using your previous token.');
       } catch (err) {
         localStorage.removeItem('token');
-        NotificationManager.push('Your previous token vas not valid.');
+        NotificationManager.push('Your previous token vas not valid.', {
+          text: 'Login again',
+          onClick: (() => {
+            this.header && this.header.openLogin();
+          }).bind(this)
+        });
         return;
       }
       state.token = token;
