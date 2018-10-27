@@ -1,21 +1,13 @@
 import Iterable from '../react-helpers/Iterable';
 
-interface ClassConstructor<P extends Class = Class>
-{
-    new (...p: any[]): any,
-    prototype: P
-}
 
-interface Class
-{
-    constructor: Function
-}
+// #region Obscure types
 
-type typeList = "string" | "number" | "boolean" | "symbol" | "undefined" | "object" | "function";
+type typeString = "string" | "number" | "boolean" | "symbol" | "undefined" | "object" | "function";
 
-type typeIndicator = typeList | ClassConstructor;
+type typeIndicator = typeString | ClassConstructor;
 
-type fromTypeString<name extends typeList> =
+type fromTypeString<name extends typeString> =
     name extends "string"    ? string    :
     name extends "number"    ? number    :
     name extends "boolean"   ? boolean   :
@@ -25,86 +17,140 @@ type fromTypeString<name extends typeList> =
     name extends "function"  ? Function  : never;
 
 type fromTypeIndicator<T extends typeIndicator> =
-    T extends typeList ? fromTypeString<T> : T extends {new (...p: any[]): infer C} ? C : never;
+    T extends typeString
+    ? fromTypeString<T>
+    : T extends {new (...p: any[]): infer C} ? C : never;
 
-type typeArrayfromTypeIndicatorArray<T extends typeIndicator[]> = {
+type typeArrayfromTypeIndicators<T extends typeIndicators> = {
     [K in number]: fromTypeIndicator<T[K]>
 };
 
-type fromTypeIndicatorArray<T extends typeIndicator[]> = typeArrayfromTypeIndicatorArray<T>[number];
+type fromTypeIndicators<T extends typeIndicators> = typeArrayfromTypeIndicators<T>[number];
 
-export type renderer<T, X> = (get: () => T, set: (value: T) => void, key: string, self: any) => X;
+// #endregion
 
 
-export type rendererArray<X> = Array<[typeIndicator[], renderer<any, X>]>; // FIXME
-/*
-type rendererArray<X, T extends typeIndicator[]> = {
-    [K in number]: T[K] extends typeIndicator ? [T[K], fromTypeIndicator<T[K]>] : never
-};
 
-const foo =
-[
-    ['string', (a: string) => Symbol()],
-    [Date, (a: Date) => Symbol()],
-];
-*/
+// #region Reasonable internal types
 
+interface ClassConstructor<P extends object = object>
+{
+    new (...p: any[]): any,
+    prototype: P
+}
 
 const PROPERTIES = Symbol('ui:properties');
-const RENDERERS  = Symbol('ui:renderers');
+const TEMP       = Symbol('ui:temp');
 
-interface PropertyInfo<X>
+type Properties<X> = Map<string, renderer<any, X>>;
+type Temp = { key: string, type: typeIndicators }[];
+
+interface RenderableClass<X> extends ClassConstructor
 {
-    type: typeIndicator[];
-    renderer: renderer<any, X>;
+    [PROPERTIES]: Properties<X>;
+    render(self: object): X[];
 }
 
-export interface RenderableClass<X>
+function isSetUp(ctor: ClassConstructor): ctor is RenderableClass<unknown>
 {
-    [PROPERTIES]: Map<string, PropertyInfo<X>>;
-    [RENDERERS]:  rendererArray<X>;
-
-    render(): X[];
-}
-
-export function isSetUp(prototype: {}): prototype is RenderableClass<any>
-{
-    if (!( self[PROPERTIES] instanceof Map )) return false;
-
-    if (!Array.isArray(self[RENDERERS])) return false;
+    if (!( ctor[PROPERTIES] instanceof Map )) return false;
 
     return true;
 }
 
+// #endregion
+
+
+
+// #region Exported types
+
+export type typeIndicators = typeIndicator[];
+
+export type renderer<T, X> = (get: () => T, set: (value: T) => void, key: string, self: any) => X;
+export type rendererArray<X> = Array<[typeIndicators, renderer<any, X>]>; // FIXME do more type-checking
+
 export type render<X> = () => X[];
 export type staticRender<T, X> = (self: T) => X[];
 
+// #endregion
 
+
+
+// #region Implementation
+
+/**
+ * Class decorator that adds a static method `render(object): X[]`.
+ * @template X - type that will be returned by the renderers, typically a JSX element
+ * @param renderers - array containing pairs of type to be matched and its respective renderer
+ * @see editable
+ *
+ * @example
+ *
+ * ```
+ * // Custom caching function
+ * function cacheOrRetrieve(){}
+ *
+ * const renderers =
+ * [
+ *     [
+ *         ['string'],
+ *         (get, set, key) =>
+ *         <input
+ *             key={key}
+ *             value={ get() }
+ *
+ *             onChange={
+ *                 cacheOrRetrieve(key, (e) =>
+ *                 {
+ *                     set(e.target.value);
+ *                     form.forceUpdate();
+ *                 })
+ *             }
+ *         />
+ *     ],
+ *     [
+ *         ['boolean'],
+ *         (get, set, key) =>
+ *         <input
+ *             key={key}
+ *             type='checkbox'
+ *             checked={ get() }
+ *
+ *             onChange={
+ *                 cacheOrRetrieve(key, (e) =>
+ *                 {
+ *                     set(e.target.checked);
+ *                     form.forceUpdate();
+ *                 })
+ *             }
+ *         />
+ *     ],
+ * ]
+ *
+ * @ui(renderers)
+ * class Person {}```
+ */
 export function ui<X>(renderers: rendererArray<X>)
 {
-    console.log('UI factory')
     return <C extends ClassConstructor>(target: C) =>
     {
-        console.log('UI decorator');
         class TargetType extends target {}
 
-        const lambda = class extends target implements RenderableClass<X>
+        const lambda: RenderableClass<X> = class Lambda extends target
         {
-            public [PROPERTIES] = new Map();
-            public [RENDERERS] = renderers;
+            public static [PROPERTIES]: Properties<X> = matchRenderers(Lambda, renderers);
 
-            public render: render<X> = this.render.bind(this, target);
             public static render(self: TargetType): X[]
             {
                 if (!isSetUp(this)) throw TypeError('The class is not set up for UI rendering. Have you called @ui() on it?');
 
                 const controls: X[] = [];
 
-                for(const [key, info] of this[PROPERTIES])
+                for(const [key, rndr] of this[PROPERTIES])
                 {
                     const get = () => self[key];
                     const set = <T>(value: T) => self[key] = value;
-                    const ctrl = info.renderer(get, set, key, self);
+                    const ctrl = rndr(get, set, key, self);
 
                     controls.push(ctrl);
                 }
@@ -113,54 +159,92 @@ export function ui<X>(renderers: rendererArray<X>)
             }
         };
 
-        (window as any).ui = { target, lambda };
-
-        return lambda;
+        return Object.assign(target, { [PROPERTIES]: lambda[PROPERTIES], render: lambda.render });
     }
 }
 
-export function editable<T extends typeIndicator[]>(...type: T)
+/**
+ * Property decorator that marks the property as renderable and matches it with a type.
+ * If you pass multiple arguments to editable, the resulting type will be a union of them.
+ * The type you enter can be wider than the actual type of the propety. This way you can
+ * mark properties that need a special renderer by a dummy class to differentiate them
+ * from the others.
+ *
+ * @see ui
+ *
+ * @example
+ *
+ * ```
+ * class ID {}
+ *
+ * @ui(renderers)
+ * class Person {
+ *     @editable('string')
+ *     public name = "John Doe";
+ *
+ *     @editable('string', ID)
+ *     public username = 'joe-dhon';
+ *
+ *     @editable(Date)
+ *     public birth = Date('1982-01-01');
+ * }```
+ *
+ */
+export function editable<T extends typeIndicators>(...type: T)
 {
-    return function<C extends { [a in K]: fromTypeIndicatorArray<T> }, K extends string>(target: C, key: K)
+    return function<C extends { [a in K]: fromTypeIndicators<T> }, K extends string>(target: C, key: K)
     {
-        if (!isSetUp(target))
-        throw TypeError('The class is not set up for UI rendering. Have you called @ui() on it?');
+        if (!target[TEMP]) target[TEMP] = [];
 
-        // tslint:disable-next-line:no-shadowed-variable see palantir/tslint#4247
-        let renderer: renderer<any, any> | undefined;
+        (target[TEMP] as Temp).push({ type, key });
+    }
+}
 
-        for (const rule of target[RENDERERS])
+
+
+function matchRenderers<X>(target: RenderableClass<X>, renderers: rendererArray<X>)
+{
+    if (!target.prototype[TEMP])
+    throw new TypeError(`No editable property was found on class "${target.name}".`);
+
+    const properties: Properties<X> = new Map();
+
+    for (const {type, key} of target.prototype[TEMP] as Temp)
+    {
+        let rndr: renderer<any, any> | undefined;
+
+        for (const rule of renderers)
         {
             if (!Iterable.areEqual(type, rule[0])) continue;
 
-            renderer = rule[1];
+            rndr = rule[1];
             break;
         }
 
 
-        if (!renderer)
+        if (!rndr)
         {
             outer:
-            for (const rule of target[RENDERERS])
+            for (const rule of renderers)
             {
                 for (const typePermutation of Iterable.permutations(rule[0]))
                 {
                     if (!Iterable.areEqual(type, typePermutation)) continue;
 
-                    renderer = rule[1];
+                    rndr = rule[1];
                     break outer;
                 }
             }
 
-            if (!renderer)
+            if (!rndr)
             {
-                const typeString = type.map(x => typeof x === 'string' ? x : x.name).join(', ');
-                throw new TypeError(`Did not find a renderer for type [${typeString}] of property "${key}".`);
+                const typeName = type.map(x => typeof x === 'string' ? x : x.name).join(', ');
+                throw new TypeError(`Did not find a renderer for type [${typeName}] of property "${key}".`);
             }
             else
             {
                 console.warn(
-                    `Type of property "${key}$ is listed in a different order than the type ${''
+                    `Type of property "${key}" is listed in a different order than the type ${''
                     }of the corresponding renderer. This has a negative impact on performance, ${''
                     }consider listing the types in alphabetical order.`
                 );
@@ -168,11 +252,14 @@ export function editable<T extends typeIndicator[]>(...type: T)
         }
 
 
-        target[PROPERTIES].set(key, { type, renderer });
+        properties.set(key, rndr);
     }
+    return properties;
 }
 
 ui.isSetUp  = isSetUp;
 ui.editable = editable;
 
 export default ui;
+
+// #endregion

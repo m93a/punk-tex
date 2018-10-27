@@ -13,7 +13,7 @@ import ui, { editable, rendererArray, staticRender } from '../lib/ui-decorators'
 import Tab from '.';
 import Reference from '../Reference';
 import { state, State } from '../state';
-// import { Ω } from '../lang';
+import { Ω } from '../lang';
 
 // Utilities
 import { Required_ish, Event, Iterable, LambdaCache, hashObject } from "../lib/react-helpers";
@@ -58,6 +58,8 @@ type ø<T> = T | undefined;
 
 // #region
 
+type renderType = React.ReactElement<{'data-key': keyof Reference.Params}>;
+
 class ID {}
 class Authors implements Partial<Reference.Authors> {}
 
@@ -70,7 +72,7 @@ function genRenderable<X>(self: ReferenceManager)
     {
         // tslint:disable:member-access
 
-        static render = 0 as any as staticRender<Reference.Params, React.ReactNode>;
+        static render = 0 as any as staticRender<Reference.Params, renderType>;
 
         @editable('string', ID) id = '';
 
@@ -96,7 +98,7 @@ function genRenderable<X>(self: ReferenceManager)
     return RenderableParamsClass;
 }
 
-function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
+function genRenderers(tab: ReferenceManager): rendererArray<renderType>
 {
     const cacheOrRetrieve = LambdaCache();
 
@@ -104,13 +106,13 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
     [
         [
             ['string'],
-            (get, set, key) =>
+            (get, set, key, ref) =>
             <input
-                key={key}
-                defaultValue={ get() }
+                data-key={key}
+                value={ get() }
 
                 onChange={
-                    cacheOrRetrieve('change', key, (e: ChangeEvent) =>
+                    cacheOrRetrieve('change', ref, key, (e: ChangeEvent) =>
                     {
                         set(e.target.value);
                         tab.forceUpdate();
@@ -122,14 +124,14 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
 
         [
             ['boolean'],
-            (get, set, key) =>
+            (get, set, key, ref) =>
             <input
-                key={key}
+                data-key={key}
                 type="checkbox"
                 checked={ get() }
 
                 onChange={
-                    cacheOrRetrieve('change', key, (e: ChangeEvent) =>
+                    cacheOrRetrieve('change', ref, key, (e: ChangeEvent) =>
                     {
                         set(e.target.checked);
                         tab.forceUpdate();
@@ -143,11 +145,11 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
             ['string', ID],
             (get, set, key, ref) =>
             <input
-                key={key}
+                data-key={key}
                 defaultValue={ get() }
 
                 onChange={
-                    cacheOrRetrieve('change', key, (e: ChangeEvent) =>
+                    cacheOrRetrieve('change', ref, key, (e: ChangeEvent) =>
                     {
                         const id1 = get();
                         const id2 = e.target.value;
@@ -158,17 +160,23 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
                             e.target.setCustomValidity('Cannot change id – this identifier is already in use.');
                             return;
                         }
+                        else
+                        {
+                            e.target.setCustomValidity('');
+                        }
 
                         set(id2);
                         refs.set(id2, ref);
                         refs.delete(id1);
                         state.editingReference = id2;
+                        tab.forceUpdate();
                     })
                 }
                 onBlur={
-                    cacheOrRetrieve('blur', key, (e: FocusEvent) =>
+                    cacheOrRetrieve('blur', ref, key, (e: FocusEvent) =>
                     {
                         e.target.value = get();
+                        e.target.setCustomValidity('');
                     })
                 }
             />
@@ -180,16 +188,16 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
             (
                 get: () => ø<Date>,
                 set: (v: ø<Date>) => void,
-                key
+                key, ref
             ) =>
             <input
-                key={key}
+                data-key={key}
                 type="date"
 
                 defaultValue={ (x => x ? formatDate(x) : undefined)(get()) }
 
                 onChange={
-                    cacheOrRetrieve('change', key, (e: ChangeEvent) =>
+                    cacheOrRetrieve('change', ref, key, (e: ChangeEvent) =>
                     {
                         const d = new Date(e.target.value);
 
@@ -201,7 +209,7 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
                     })
                 }
                 onBlur={
-                    cacheOrRetrieve('blur', key, (e: FocusEvent) =>
+                    cacheOrRetrieve('blur', ref, key, (e: FocusEvent) =>
                     {
                         e.target.value = (x => x ? formatDate(x) : '')(get());
                     })
@@ -215,15 +223,15 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
             (
                 get: () => ø<URL>,
                 set: (v: ø<URL>) => void,
-                key
+                key, ref
             ) =>
             <input
-                key={key}
+                data-key={key}
                 type="url"
                 defaultValue={ (x => x ? x.href : undefined)(get()) }
 
                 onChange={
-                    cacheOrRetrieve('change', key, (e: ChangeEvent) =>
+                    cacheOrRetrieve('change', ref, key, (e: ChangeEvent) =>
                     {
                         if (e.target.validity.valid)
                         try
@@ -235,7 +243,7 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
                     })
                 }
                 onBlur={
-                    cacheOrRetrieve('blur', key, (e: FocusEvent) =>
+                    cacheOrRetrieve('blur', ref, key, (e: FocusEvent) =>
                     {
                         e.target.value = (x => x ? x.href : '')(get());
                     })
@@ -246,8 +254,8 @@ function genRenderers(tab: ReferenceManager): rendererArray<React.ReactNode>
 
         [
             [Authors],
-            (a, b, c, ref: Reference.Params) =>
-            <table><tbody>
+            (a, b, key, ref: Reference.Params) =>
+            <table data-key={key}><tbody>
                 <tr><td>
                     <FaPlusCircle
                         className="icon button"
@@ -357,10 +365,11 @@ extends React.Component<ButtonProps>
 {
     public render()
     {
-        return <FaRegBookmark {...buttonParams} />;
+        // tslint:disable-next-line:jsx-no-bind
+        return <FaRegBookmark {...buttonParams} onClick={this.onClick} />;
     }
 
-    public onClick()
+    public onClick = () =>
     {
         const index = state.pointToIndex(state.cursor);
 
@@ -382,10 +391,10 @@ extends React.Component<ButtonProps>
 {
     public render()
     {
-        return <FaRegEdit {...buttonParams} />;
+        return <FaRegEdit {...buttonParams} onClick={this.onClick} />;
     }
 
-    public onClick()
+    public onClick = () =>
     {
         state.editingReference = this.props.id;
         this.props.tab.forceUpdate();
@@ -398,10 +407,10 @@ extends React.Component<ButtonProps>
 {
     public render()
     {
-        return <FaRegTrashAlt {...buttonParams} />;
+        return <FaRegTrashAlt {...buttonParams} onClick={this.onClick} />;
     }
 
-    public onClick()
+    public onClick = () =>
     {
         const id = this.props.id;
 
@@ -419,10 +428,10 @@ extends React.Component<ButtonProps>
 {
     public render()
     {
-        return <FaPlusCircle {...buttonClass} />;
+        return <FaPlusCircle {...buttonClass} onClick={this.onClick} />;
     }
 
-    public onClick()
+    public onClick = () =>
     {
         let id: string;
         do
@@ -451,13 +460,13 @@ extends React.Component<ButtonProps>
 {
     public render()
     {
-        return <FaTimesCircle {...buttonClass} />;
+        return <FaTimesCircle {...buttonClass} onClick={this.onClick} />;
     }
 
-    public onClick()
+    public onClick = () =>
     {
         state.editingReference = undefined;
-        this.forceUpdate();
+        this.props.tab.forceUpdate();
     }
 }
 
@@ -517,21 +526,32 @@ class ReferenceManager extends Tab
             <Reference {...ref} />
         </div>;
 
-        return node
+        return node;
     }
 
     private renderEditor(ref: Reference.Params)
     {
-        const arr: React.ReactNode[] = this.RenderableEditor.render(ref);
-
-        const node =
+        return (
         <div key={hashObject(ref)} className="ref-edit">
+
             <CloseEditButton tab={this} id='' />
             <span className="ref-edit-title">Editace reference [{ref.id}]</span>
-            <table><tbody>{arr}</tbody></table>
-        </div>
 
-        return node;
+            <table><tbody>
+            {
+                this.RenderableEditor.render(ref).map(el =>
+                    <tr key={el.props['data-key']}>
+
+                        <td><Ω c="reference" k={el.props['data-key']} /></td>
+
+                        <td>{el}</td>
+
+                    </tr>
+                )
+            }
+            </tbody></table>
+        </div>
+        );
     }
 
 
