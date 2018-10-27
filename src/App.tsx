@@ -12,9 +12,11 @@ import Tab        from './tab';
 import Editor     from './tab/Editor';
 import Preview    from './tab/Preview';
 import References from './tab/ReferenceManager';
+import Data       from './tab/DataManager';
+import Equations  from './tab/Equations';
 
 
-const availableTabs: (typeof Tab)[] = [Editor, Preview, References];
+const availableTabs: (typeof Tab)[] = [Editor, Preview, References, Data, Equations];
 
 state.tabs = [Editor, Preview];
 

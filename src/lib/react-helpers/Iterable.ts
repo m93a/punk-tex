@@ -101,15 +101,16 @@ namespace IterableHelpers
 
     export function* filter<T>(
         iterable: Iterable<T>,
-        fn: (item: T) => boolean
+        fn: (item: T, index: number) => boolean
     )
     : Iterable<T>
     {
         const iterator = iterable[Symbol.iterator]();
         let next = iterator.next();
+        let i = 0;
         while (!next.done)
         {
-            if (fn(next.value))
+            if (fn(next.value, i++))
             {
                 yield next.value;
             }
@@ -310,15 +311,16 @@ namespace IterableHelpers
 
     export function some<T>(
         iterable: Iterable<T>,
-        fn: (item: T) => boolean
+        fn: (item: T, index: number) => boolean
     )
     : boolean
     {
         const iterator = iterable[Symbol.iterator]();
         let next = iterator.next();
+        let i = 0;
         while (!next.done)
         {
-            if (fn(next.value))
+            if (fn(next.value, i++))
             {
                 return true;
             }
@@ -338,11 +340,11 @@ namespace IterableHelpers
 
     export function every<T>(
         iterable: Iterable<T>,
-        fn: (item: T) => boolean
+        fn: (item: T, index: number) => boolean
     )
     : boolean
     {
-        return !some( iterable, x => !fn(x) );
+        return !some( iterable, (x,i) => !fn(x,i) );
     }
 
 
@@ -355,15 +357,16 @@ namespace IterableHelpers
 
     export function* map<T, S>(
         iterable: Iterable<T>,
-        fn: (item: T) => S
+        fn: (item: T, index: number) => S
     )
     : Iterable<S>
     {
         const iterator = iterable[Symbol.iterator]();
         let next = iterator.next();
+        let i = 0;
         while (!next.done)
         {
-            yield fn(next.value);
+            yield fn(next.value, i++);
             next = iterator.next();
         }
 
