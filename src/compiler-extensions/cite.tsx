@@ -4,7 +4,7 @@ import { MarkdownIt } from 'markdown-it';
 import { State } from '../state';
 import { renderAsInlineToken } from '../lib/markdown-it-react-interop';
 
-import Reference from '../Reference';
+import Reference from '../structures/Reference';
 import makeRule from './lib.inline-command';
 
 export default function insertPlugin(md: MarkdownIt, appState: State)

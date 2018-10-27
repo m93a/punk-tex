@@ -1,11 +1,14 @@
-import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';
-import { IndexOutOfRangeError } from './lib/react-helpers';
-import sampleText from './sampleText';
 import Tab from './tab';
-import Reference from './Reference';
-import sampleReferences from './sampleReferences';
+
+import Reference from './structures/Reference';
 import LangStrings from './lang/_types';
 import { loadLang } from './lang';
+
+import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';
+import { IndexOutOfRangeError } from './lib/react-helpers';
+
+import sampleText from './defaults/sampleText';
+import sampleReferences from './defaults/sampleReferences';
 
 export interface Point
 {

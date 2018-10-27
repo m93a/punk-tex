@@ -11,7 +11,7 @@ import ui, { editable, rendererArray, staticRender } from '../lib/ui-decorators'
 
 // Local functions
 import Tab from '.';
-import Reference from '../Reference';
+import Reference from '../structures/Reference';
 import { state, State } from '../state';
 import { Ω } from '../lang';
 
@@ -199,6 +199,11 @@ function genRenderers(tab: ReferenceManager): rendererArray<renderType>
                 onChange={
                     cacheOrRetrieve('change', ref, key, (e: ChangeEvent) =>
                     {
+                        if (e.target.value)
+                        {
+                            set(undefined);
+                        }
+
                         const d = new Date(e.target.value);
 
                         if (!isNaN(+d))

@@ -1,4 +1,4 @@
-import Reference from '../Reference';
+import Reference from '../structures/Reference';
 
 export type ReferenceStrings =
 {
