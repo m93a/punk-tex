@@ -13,7 +13,7 @@ state.tabs = [Tabs.Editor, Tabs.Preview];
 
 class App extends React.Component<{}, App.AppState>
 {
-  private header: HeaderC;
+  private header?: HeaderC = undefined;
   public state = {
     navOpen: false,
   } as App.AppState;

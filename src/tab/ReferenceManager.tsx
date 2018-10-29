@@ -12,7 +12,7 @@ import ui, { editable, rendererArray, staticRender } from '../lib/ui-decorators'
 
 import Tab from './Tab';
 import { State, state } from '../state';
-import Event from '../lib/react-helpers/Event';
+// import Event from '../lib/react-helpers/Event';
 
 import Reference from '../structures/Reference';
 import { Ω } from '../lang';

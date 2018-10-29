@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Tab from '.';
+import Tab from './Tab';
 import { Data, Table } from '../structures/Data';
 
 import * as parseDecimal from 'parse-decimal-number';

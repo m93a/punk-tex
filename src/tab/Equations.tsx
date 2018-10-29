@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as math from 'mathjs';
 import * as TexZilla from 'texzilla';
-import Tab from '.';
+import Tab from './Tab';
 
 class Equations extends Tab
 {
