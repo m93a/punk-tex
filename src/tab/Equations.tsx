@@ -16,9 +16,11 @@ class Equations extends Tab
             {
                 this.eqns.map( ([name, eq], i) =>
                     <p key={i}>
-                        <span dangerouslySetInnerHTML={{ __html: TexZilla.toMathMLString(name.toTex()) }} />
-                        =
-                        <span dangerouslySetInnerHTML={{ __html: TexZilla.toMathMLString(  eq.toTex()) }} />
+                        <span dangerouslySetInnerHTML={{
+                            __html: TexZilla.toMathMLString(
+                                name.toTex() + '=' + eq.toTex()
+                            )
+                        }} />
                     </p>
                 )
             }
