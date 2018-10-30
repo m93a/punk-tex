@@ -6,7 +6,7 @@ import * as TexZilla from 'texzilla';
 import mdMath from 'markdown-it-math';
 import mdReplace from 'markdown-it-replacements';
 
-import { state, State } from './state';
+import { state, AppState } from './state';
 import references from './compiler-extensions/cite';
 import punktex from './compiler-extensions/punktex';
 
@@ -75,6 +75,6 @@ export function renderToElement(id: string, code: string)
 	catch(e)
 	{
 		console.error('Compilation error: ', e);
-		return state.dispatchEvent(State.Event.CompilationError);
+		return state.dispatchEvent(AppState.Event.CompilationError);
 	}
 }

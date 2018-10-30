@@ -16,11 +16,13 @@ export interface Point
     column: number;
 }
 
-export interface State
-extends EventTarget<State.Event>
+export interface AppState
+extends EventTarget<AppState.Event>
 {
     language: string;
     strings: LangStrings;
+
+    workspace: number;
 
     tabs: (typeof Tab)[];
     content: string;
@@ -36,7 +38,7 @@ extends EventTarget<State.Event>
     indexToPoint(index: number): Point;
 }
 
-export namespace State
+export namespace AppState
 {
     export enum Event
     {
@@ -49,7 +51,7 @@ export namespace State
     }
 }
 
-export const state: State =
+export const state: AppState =
 {
     addEventListener,
     removeEventListener,
@@ -57,6 +59,8 @@ export const state: State =
 
     language: 'cs',
     strings: loadLang('cs'),
+
+    workspace: 0,
 
     tabs: [],
     content: sampleText,

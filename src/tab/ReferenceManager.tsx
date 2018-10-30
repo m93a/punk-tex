@@ -11,7 +11,7 @@ import ui, { editable, rendererArray, staticRender } from '../lib/ui-decorators'
 
 
 import Tab from './Tab';
-import { State, state } from '../state';
+import { AppState, state } from '../state';
 // import Event from '../lib/react-helpers/Event';
 
 import Reference from '../structures/Reference';
@@ -383,7 +383,7 @@ extends React.Component<ButtonProps>
             state.content.substring(index);
 
         state.dispatchEvent(
-            State.Event.ContentChange,
+            AppState.Event.ContentChange,
             { source: this }
         );
     }
@@ -571,7 +571,7 @@ class ReferenceManager extends Tab
     public componentDidMount()
     {
         state.addEventListener(
-            State.Event.ContentChange,
+            AppState.Event.ContentChange,
             this.onExternalChange
         );
     }
@@ -579,7 +579,7 @@ class ReferenceManager extends Tab
     public componentWillUnmount()
     {
         state.removeEventListener(
-            State.Event.ContentChange,
+            AppState.Event.ContentChange,
             this.onExternalChange
         );
     }

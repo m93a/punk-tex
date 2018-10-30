@@ -7,7 +7,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import Add from '@material-ui/icons/Add';
 import { Logo } from './components';
 import Session from './session';
-import state, { State as AppState } from './state';
+import state, { AppState } from './state';
 
 interface Menu {
     icon: typeof Material.SvgIcon;

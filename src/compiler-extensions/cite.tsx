@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 import { MarkdownIt } from 'markdown-it';
-import { State } from '../state';
+import { AppState } from '../state';
 import { renderAsInlineToken } from '../lib/markdown-it-react-interop';
 
 import Reference from '../structures/Reference';
 import makeRule from './lib.inline-command';
 
-export default function insertPlugin(md: MarkdownIt, appState: State)
+export default function insertPlugin(md: MarkdownIt, appState: AppState)
 {
     let usedRefs: string[] = [];
 

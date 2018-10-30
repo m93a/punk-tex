@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Strings } from './_types';
-import { State, state } from '../state';
+import { AppState, state } from '../state';
 
 import cs from './cs';
 import en from './en';
@@ -25,7 +25,7 @@ export function changeLanguage(code: string): void
 {
     state.strings = loadLang(code);
     state.language = code;
-    state.dispatchEvent(State.Event.LanguageChange);
+    state.dispatchEvent(AppState.Event.LanguageChange);
 }
 
 export function ω(

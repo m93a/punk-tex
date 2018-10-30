@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import Tab from './Tab';
-import { State, state } from '../state';
+import { AppState, state } from '../state';
 import Event from '../lib/react-helpers/Event';
 
 import Ace from 'react-ace';
@@ -52,7 +52,7 @@ export default class Editor extends Tab
     {
         this.props.state.content = content;
         this.props.state.dispatchEvent(
-            State.Event.ContentChange,
+            AppState.Event.ContentChange,
             { source: this }
         );
     }
@@ -65,7 +65,7 @@ export default class Editor extends Tab
     public componentDidMount()
     {
         this.props.state.addEventListener(
-            State.Event.ContentChange,
+            AppState.Event.ContentChange,
             this.onExternalChange
         );
     }
@@ -73,7 +73,7 @@ export default class Editor extends Tab
     public componentWillUnmount()
     {
         this.props.state.removeEventListener(
-            State.Event.ContentChange,
+            AppState.Event.ContentChange,
             this.onExternalChange
         );
     }

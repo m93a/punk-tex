@@ -1,22 +1,51 @@
 // Global
 import * as React from 'react';
 import './styles/App.css';
-import state, { State } from './state';
+import state, { AppState } from './state';
+import * as Material from '@material-ui/core';
 
-import * as Tabs     from './tab';
+import Tab, * as Tabs     from './tab';
 import Navigation from './Navigation';
 import Session from './session';
 import NotificationManager from './NotificationManager';
 import { default as Header, Header as HeaderC } from './Header';
 
+import * as Grid from 'react-grid-layout';
+const GridLayout = Grid.WidthProvider(Grid);
+
+// CSS imports
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import WorkspaceNav from './WorkspaceNav';
+
 state.tabs = [Tabs.Editor, Tabs.Preview];
 
-class App extends React.Component<{}, App.AppState>
+export interface ExtendedLayout
+extends Grid.Layout {
+  type: typeof Tab;
+}
+
+const defaultLayout: ExtendedLayout[][] = [
+  [
+    { i: 'Editor', type: Tabs.Editor, x: 0, y: 0, w: 5, h: 8 },
+    { i: 'Preview', type: Tabs.Preview, x: 5, y: 0, w: 7, h: 8 },
+  ],
+  [
+    { i: 'DataManager', type: Tabs.DataManager, x: 0, y: 0, w: 6, h: 4 },
+    { i: 'References', type: Tabs.References, x: 6, y: 0, w: 6, h: 4 },
+  ],
+  [
+    { i: 'Equations', type: Tabs.Equations, x: 0, y: 0, w: 5, h: 4 },
+  ],
+];
+
+class App extends React.Component<{}, App.State>
 {
   private header?: HeaderC = undefined;
   public state = {
     navOpen: false,
-  } as App.AppState;
+    layout: defaultLayout,
+  } as App.State;
 
   private toggleNav = () => {
     this.setState({ navOpen: !this.state.navOpen });
@@ -26,8 +55,14 @@ class App extends React.Component<{}, App.AppState>
     this.header = h;
   }
 
+  private switchWorkspace = (a: any, v: number) => {
+    state.workspace = v;
+    this.forceUpdate();
+  }
+
   public render()
   {
+    const workspaces = this.state.layout;
     // <Navigation/>
     return (
       <div className="App">
@@ -38,11 +73,31 @@ class App extends React.Component<{}, App.AppState>
           open={this.state.navOpen}
           toggleNav={this.toggleNav}
         />
-        <div className="App-intro">
-          {
-            state.tabs.map( (T, i) => <T key={i} state={state} />)
-          }
-        </div>
+        <GridLayout
+          className='layout'
+          layout={defaultLayout[state.workspace]}
+          margin={[10, 10]}
+          style={{
+            marginBottom: '56px',
+          }}
+        >
+        {workspaces[state.workspace].map(T => (
+          <Material.Paper
+            key={T.i}
+            style={{
+              overflow: 'scroll',
+            }}
+          >
+            <T.type
+              state={state}
+            />
+          </Material.Paper>
+        ))}
+        </GridLayout>
+        <WorkspaceNav
+          state={state}
+          onSwitchWorkspace={this.switchWorkspace}
+        />
         <NotificationManager/>
       </div>
     );
@@ -55,13 +110,13 @@ class App extends React.Component<{}, App.AppState>
 
   public componentDidMount()
   {
-    state.addEventListener(State.Event.TabChange, this.update);
+    state.addEventListener(AppState.Event.TabChange, this.update);
     this.checkLogin();
   }
 
   public componentWillUnmount()
   {
-    state.removeEventListener(State.Event.TabChange, this.update);
+    state.removeEventListener(AppState.Event.TabChange, this.update);
   }
 
   private checkLogin = async () => {
@@ -81,15 +136,16 @@ class App extends React.Component<{}, App.AppState>
         return;
       }
       state.token = token;
-      state.dispatchEvent(State.Event.LoginStateChange);
+      state.dispatchEvent(AppState.Event.LoginStateChange);
       localStorage.setItem('token', token);
     }
   }
 }
 
 namespace App {
-  export interface AppState {
+  export interface State {
     navOpen: boolean;
+    layout: ExtendedLayout[][];
   }
 }
 

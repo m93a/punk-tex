@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import Tab from './Tab';
-import { State } from '../state';
+import { AppState } from '../state';
 import { renderToElement } from '../compiler';
 
 import Image from '@material-ui/icons/Image';
@@ -33,12 +33,12 @@ export default class Preview extends Tab
 
     public componentDidMount()
     {
-        this.props.state.addEventListener(State.Event.ContentChange, this.onChange);
+        this.props.state.addEventListener(AppState.Event.ContentChange, this.onChange);
         this.onChange();
     }
 
     public componentWillUnmount()
     {
-        this.props.state.removeEventListener(State.Event.ContentChange, this.onChange);
+        this.props.state.removeEventListener(AppState.Event.ContentChange, this.onChange);
     }
 }

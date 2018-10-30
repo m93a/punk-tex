@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { LambdaCache } from './lib/react-helpers';
-import { State } from './state';
+import { AppState } from './state';
 import * as Material from '@material-ui/core';
 
 import { default as Tab, available } from './tab';
@@ -23,7 +23,7 @@ namespace Navigation
         open?: boolean;
         toggleNav?(): void;
 
-        state: State,
+        state: AppState,
         columns: number,
         onTabClick?: (col: number, tab: typeof Tab) => void
     }
@@ -54,7 +54,7 @@ class Navigation extends React.Component<Navigation.Props>
 
             // Change the tab
             state.tabs[col] = tab;
-            state.dispatchEvent(State.Event.TabChange, { source: this });
+            state.dispatchEvent(AppState.Event.TabChange, { source: this });
         }
 
         return this.cacheOrRetrieve(tab, col, callback);

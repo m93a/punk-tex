@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { State } from '../state';
+import { AppState } from '../state';
 import { SvgIcon } from '@material-ui/core';
 import * as Icons from '@material-ui/icons';
 
@@ -18,7 +18,7 @@ namespace Tab
 {
     export interface Props
     {
-        state: State;
+        state: AppState;
     }
 }
 
