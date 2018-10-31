@@ -42,7 +42,7 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
                     icon={<Explicit/>}
                 />
                 <Material.BottomNavigationAction
-                    label="Lock workspace"
+                    label={this.props.unlocked ? "Lock workspace" : "Unlock workspace"}
                     icon={<Explicit/>}
                 />
             </Material.BottomNavigation>
@@ -52,6 +52,8 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
 
 namespace WorkspaceNav {
     export interface Props {
+        unlocked: boolean;
+
         state: AppState;
         onToggleLock?(): void;
         onSwitchWorkspace?(event: any, index: number): void;

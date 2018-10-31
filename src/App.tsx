@@ -89,6 +89,7 @@ class App extends React.Component<{}, App.State>
         ))}
         </GridLayout>
         <WorkspaceNav
+          unlocked={this.state.unlocked}
           state={state}
           onSwitchWorkspace={this.switchWorkspace}
           onToggleLock={this.toggleLock}

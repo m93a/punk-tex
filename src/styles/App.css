@@ -81,18 +81,6 @@ html, body, #root, .App {
   margin-top: .3em;
 }
 
-.App-intro {
-  height: calc(100% - 190px);
-  font-size: large;
-  display: flex;
-  flex-direction: row;
-  text-align: left;
-}
-
-.App-intro > * {
-  flex: 1 100%;
-}
-
 .editor {
   font-size: 16px;
 }
@@ -145,11 +133,9 @@ input:focus:invalid {
   font-size: 1.2em;
 }
 
-
 .render-target {
   padding-left: 20px;
   font-family: "CMU Serif";
-  overflow-y: scroll;
 }
 
 .render-target .error {
