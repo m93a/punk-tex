@@ -43,6 +43,7 @@ class App extends React.Component<{}, App.State>
   private header?: HeaderC = undefined;
   public state = {
     layout: defaultLayout,
+    unlocked: false,
   } as App.State;
 
   private setHeader = (h: HeaderC) => {
@@ -54,6 +55,8 @@ class App extends React.Component<{}, App.State>
     this.forceUpdate();
   }
 
+  private toggleLock = () => this.setState({ unlocked: !this.state.unlocked });
+
   public render()
   {
     const workspaces = this.state.layout;
@@ -62,6 +65,9 @@ class App extends React.Component<{}, App.State>
       <div className="App">
         <Header innerRef={this.setHeader}/>
         <GridLayout
+          isDraggable={this.state.unlocked}
+          isRearrangeable={this.state.unlocked}
+          isResizable={this.state.unlocked}
           className='layout'
           layout={defaultLayout[state.workspace]}
           margin={[10, 10]}
@@ -85,6 +91,7 @@ class App extends React.Component<{}, App.State>
         <WorkspaceNav
           state={state}
           onSwitchWorkspace={this.switchWorkspace}
+          onToggleLock={this.toggleLock}
         />
         <NotificationManager/>
       </div>
@@ -133,6 +140,7 @@ class App extends React.Component<{}, App.State>
 namespace App {
   export interface State {
     layout: ExtendedLayout[][];
+    unlocked: boolean;
   }
 }
 

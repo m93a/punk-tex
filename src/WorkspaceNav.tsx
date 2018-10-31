@@ -9,6 +9,10 @@ import Explicit from '@material-ui/icons/Explicit';
 class WorkspaceNav
 extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
     private onChange = (e: any, v: number) => {
+        if (v === 3) {
+            this.props.onToggleLock && this.props.onToggleLock();
+            return;
+        }
         this.props.onSwitchWorkspace && this.props.onSwitchWorkspace(e, v);
     }
 
@@ -37,6 +41,10 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
                     label="Math"
                     icon={<Explicit/>}
                 />
+                <Material.BottomNavigationAction
+                    label="Lock workspace"
+                    icon={<Explicit/>}
+                />
             </Material.BottomNavigation>
         );
     }
@@ -45,6 +53,7 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
 namespace WorkspaceNav {
     export interface Props {
         state: AppState;
+        onToggleLock?(): void;
         onSwitchWorkspace?(event: any, index: number): void;
     }
 
