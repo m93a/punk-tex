@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Material from '@material-ui/core';
 
 // Icons
-import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Add from '@material-ui/icons/Add';
 import { Logo } from './components';
@@ -116,16 +115,6 @@ extends React.Component<Header.Props, Header.State> {
         return (
             <Material.AppBar position='relative'>
                 <Material.Toolbar>
-                    <Material.IconButton
-                        color='inherit'
-                        style={{
-                            marginLeft: -12,
-                            marginRight: 20,
-                        }}
-                        onClick={this.props.toggleNav}
-                    >
-                        <MenuIcon/>
-                    </Material.IconButton>
                     <Material.Typography variant='h6' className="punkTeX" color='inherit' style={{
                         textAlign: 'left',
                         flexGrow: 1,
@@ -187,7 +176,6 @@ extends React.Component<Header.Props, Header.State> {
 
 export namespace Header {
     export interface Props {
-        toggleNav?(): void;
     }
 
     export interface State {

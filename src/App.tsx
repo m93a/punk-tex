@@ -5,7 +5,6 @@ import state, { AppState } from './state';
 import * as Material from '@material-ui/core';
 
 import Tab, * as Tabs     from './tab';
-import Navigation from './Navigation';
 import Session from './session';
 import NotificationManager from './NotificationManager';
 import { default as Header, Header as HeaderC } from './Header';
@@ -43,13 +42,8 @@ class App extends React.Component<{}, App.State>
 {
   private header?: HeaderC = undefined;
   public state = {
-    navOpen: false,
     layout: defaultLayout,
   } as App.State;
-
-  private toggleNav = () => {
-    this.setState({ navOpen: !this.state.navOpen });
-  }
 
   private setHeader = (h: HeaderC) => {
     this.header = h;
@@ -66,13 +60,7 @@ class App extends React.Component<{}, App.State>
     // <Navigation/>
     return (
       <div className="App">
-        <Header toggleNav={this.toggleNav} innerRef={this.setHeader}/>
-        <Navigation
-          state={state}
-          columns={2}
-          open={this.state.navOpen}
-          toggleNav={this.toggleNav}
-        />
+        <Header innerRef={this.setHeader}/>
         <GridLayout
           className='layout'
           layout={defaultLayout[state.workspace]}
@@ -144,7 +132,6 @@ class App extends React.Component<{}, App.State>
 
 namespace App {
   export interface State {
-    navOpen: boolean;
     layout: ExtendedLayout[][];
   }
 }
