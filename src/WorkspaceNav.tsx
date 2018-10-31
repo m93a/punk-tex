@@ -5,6 +5,8 @@ import { AppState } from './state';
 import Receipt from '@material-ui/icons/Receipt';
 import InsertChart from '@material-ui/icons/InsertChart';
 import Explicit from '@material-ui/icons/Explicit';
+import Lock from '@material-ui/icons/Lock';
+import LockOpen from '@material-ui/icons/LockOpen';
 
 class WorkspaceNav
 extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
@@ -43,7 +45,7 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
                 />
                 <Material.BottomNavigationAction
                     label={this.props.unlocked ? "Lock workspace" : "Unlock workspace"}
-                    icon={<Explicit/>}
+                    icon={this.props.unlocked ? <Lock/> : <LockOpen/>}
                 />
             </Material.BottomNavigation>
         );

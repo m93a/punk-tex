@@ -7,6 +7,7 @@ import * as Material from '@material-ui/core';
 import Tab, * as Tabs     from './tab';
 import Session from './session';
 import NotificationManager from './NotificationManager';
+import WorkspaceNav from './WorkspaceNav';
 import { default as Header, Header as HeaderC } from './Header';
 
 import * as Grid from 'react-grid-layout';
@@ -15,7 +16,7 @@ const GridLayout = Grid.WidthProvider(Grid);
 // CSS imports
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import WorkspaceNav from './WorkspaceNav';
+import TabAddButton from './TabAddButton';
 
 state.tabs = [Tabs.Editor, Tabs.Preview];
 
@@ -88,6 +89,7 @@ class App extends React.Component<{}, App.State>
           </Material.Paper>
         ))}
         </GridLayout>
+        <TabAddButton/>
         <WorkspaceNav
           unlocked={this.state.unlocked}
           state={state}
