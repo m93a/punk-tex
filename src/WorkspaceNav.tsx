@@ -44,7 +44,7 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
                     label="Math"
                     icon={<Explicit/>}
                 />
-                <Material.BottomNavigationAction
+                <BottomNavigationAction
                     label={this.props.unlocked ? "Lock workspace" : "Unlock workspace"}
                     icon={this.props.unlocked ? <Lock/> : <LockOpen/>}
                 />
