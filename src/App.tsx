@@ -2,7 +2,7 @@
 import * as React from 'react';
 import './styles/App.css';
 import state, { AppState } from './state';
-import * as Material from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
 
 import Tab, * as Tabs     from './tab';
 import Session from './session';
@@ -77,7 +77,7 @@ class App extends React.Component<{}, App.State>
           }}
         >
         {workspaces[state.workspace].map(T => (
-          <Material.Paper
+          <Paper
             key={T.i}
             style={{
               overflow: 'scroll',
@@ -86,7 +86,7 @@ class App extends React.Component<{}, App.State>
             <T.type
               state={state}
             />
-          </Material.Paper>
+          </Paper>
         ))}
         </GridLayout>
         <TabAddButton/>

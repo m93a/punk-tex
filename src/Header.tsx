@@ -1,15 +1,33 @@
 import * as React from 'react';
-import * as Material from '@material-ui/core';
 
-// Icons
+// Material
+import withStyles from '@material-ui/core/styles/withStyles';
+import createStyles from '@material-ui/core/styles/createStyles';
+import { Theme } from '@material-ui/core/styles';
+import SvgIcon from '@material-ui/core/SvgIcon';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Add from '@material-ui/icons/Add';
+
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+
+
 import { Logo } from './components';
 import Session from './session';
 import state, { AppState } from './state';
 
 interface Menu {
-    icon: typeof Material.SvgIcon;
+    icon: typeof SvgIcon;
     items: Partial<{
         title: string;
         type: 'item' | 'delimiter'
@@ -24,7 +42,7 @@ interface Menus {
     [id: string]: Menu,
 }
 
-const styles = (theme: Material.Theme) => Material.createStyles({
+const styles = (theme: Theme) => createStyles({
     paper: {
       position: 'absolute',
       width: theme.spacing.unit * 50,
@@ -113,26 +131,26 @@ extends React.Component<Header.Props, Header.State> {
 
     public render() {
         return (
-            <Material.AppBar position='relative'>
-                <Material.Toolbar>
-                    <Material.Typography variant='h6' className="punkTeX" color='inherit' style={{
+            <AppBar position='relative'>
+                <Toolbar>
+                    <Typography variant='h6' className="punkTeX" color='inherit' style={{
                         textAlign: 'left',
                         flexGrow: 1,
                     }}>
                         <Logo/>
-                    </Material.Typography>
+                    </Typography>
                     {
                         Object.keys(this.menus).map(_m => {
                             const m = this.menus[_m];
                             return (
                                 <div key={_m}>
-                                    <Material.IconButton
+                                    <IconButton
                                         color='inherit'
                                         onClick={this.openMenu(_m)}
                                     >
                                         <m.icon/>
-                                    </Material.IconButton>
-                                    <Material.Menu
+                                    </IconButton>
+                                    <Menu
                                         open={Boolean(this.state.isOpen[_m])}
                                         anchorEl={this.state.isOpen[_m]}
                                         onClose={this.closeMenu(_m)}
@@ -143,24 +161,24 @@ extends React.Component<Header.Props, Header.State> {
                                             for (const item of m.items) {
                                                 if (!item.visible || item.visible()) {
                                                     nodes.push(
-                                                        <Material.MenuItem
+                                                        <MenuItem
                                                             key={item.title}
                                                             onClick={item.action}
                                                         >
                                                         {item.title}
-                                                        </Material.MenuItem>
+                                                        </MenuItem>
                                                     );
                                                 }
                                             }
                                             return nodes;
                                         })()
                                     }
-                                    </Material.Menu>
+                                    </Menu>
                                 </div>
                             );
                         })
                     }
-                </Material.Toolbar>
+                </Toolbar>
                 <Header.LoginDialog
                     open={this.state.modal === 'login'}
                     onClose={this.closeModal}
@@ -169,7 +187,7 @@ extends React.Component<Header.Props, Header.State> {
                     open={this.state.modal === 'register'}
                     onClose={this.closeModal}
                 />
-            </Material.AppBar>
+            </AppBar>
         );
     }
 }
@@ -212,15 +230,15 @@ export namespace Header {
 
         public render() {
             return (
-                <Material.Dialog
+                <Dialog
                     open={this.props.open}
                     onClose={this.props.onClose}
                 >
-                    <Material.DialogTitle>
+                    <DialogTitle>
                     Log in to your account
-                    </Material.DialogTitle>
-                    <Material.DialogContent>
-                        <Material.TextField
+                    </DialogTitle>
+                    <DialogContent>
+                        <TextField
                             id='email'
                             label='E-mail'
                             type='email'
@@ -228,7 +246,7 @@ export namespace Header {
                             onChange={this.handleChange}
                             fullWidth
                         />
-                        <Material.TextField
+                        <TextField
                             id='password'
                             label='Password'
                             type='password'
@@ -236,21 +254,21 @@ export namespace Header {
                             onChange={this.handleChange}
                             fullWidth
                         />
-                    </Material.DialogContent>
-                    <Material.DialogActions>
-                        <Material.Button
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
                             color='primary'
                             onClick={this.login}
                         >
                             Login
-                        </Material.Button>
-                        <Material.Button
+                        </Button>
+                        <Button
                             onClick={this.props.onClose}
                         >
                             Cancel
-                        </Material.Button>
-                    </Material.DialogActions>
-                </Material.Dialog>
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             );
         }
     }
@@ -284,15 +302,15 @@ export namespace Header {
 
         public render() {
             return (
-                <Material.Dialog
+                <Dialog
                     open={this.props.open}
                     onClose={this.props.onClose}
                 >
-                    <Material.DialogTitle>
+                    <DialogTitle>
                     Register a new account
-                    </Material.DialogTitle>
-                    <Material.DialogContent>
-                        <Material.TextField
+                    </DialogTitle>
+                    <DialogContent>
+                        <TextField
                             id='email'
                             label='E-mail'
                             type='email'
@@ -300,7 +318,7 @@ export namespace Header {
                             onChange={this.handleChange}
                             fullWidth
                         />
-                        <Material.TextField
+                        <TextField
                             id='password'
                             label='Password'
                             type='password'
@@ -308,7 +326,7 @@ export namespace Header {
                             onChange={this.handleChange}
                             fullWidth
                         />
-                        <Material.TextField
+                        <TextField
                             id='confirmPassword'
                             label='Confirm password'
                             type='password'
@@ -316,20 +334,20 @@ export namespace Header {
                             onChange={this.handleChange}
                             fullWidth
                         />
-                    </Material.DialogContent>
-                    <Material.DialogActions>
-                        <Material.Button
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
                             color='primary'
                         >
                             Register
-                        </Material.Button>
-                        <Material.Button
+                        </Button>
+                        <Button
                             onClick={this.props.onClose}
                         >
                             Cancel
-                        </Material.Button>
-                    </Material.DialogActions>
-                </Material.Dialog>
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             );
         }
     }
@@ -350,4 +368,4 @@ export namespace Header {
     }
 }
 
-export default Material.withStyles(styles)(Header);
+export default withStyles(styles)(Header);

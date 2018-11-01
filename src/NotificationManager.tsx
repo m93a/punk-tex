@@ -1,6 +1,7 @@
 import * as React from 'react';
-import * as Material from '@material-ui/core';
 import * as _ from 'lodash';
+import Snackbar from '@material-ui/core/Snackbar';
+import Button from '@material-ui/core/Button';
 
 interface NotificationAction {
     text: string;
@@ -104,7 +105,7 @@ namespace NotificationManager {
         public render() {
             const { id, text, timeout } = this.props;
             return (
-                <Material.Snackbar
+                <Snackbar
                     anchorOrigin={{
                         horizontal: 'left',
                         vertical: 'bottom'
@@ -118,12 +119,12 @@ namespace NotificationManager {
                         <span>{text}</span>
                     )}
                     action={this.props.action ? (
-                        <Material.Button
+                        <Button
                             onClick={this.props.action.onClick}
                             color='secondary'
                         >
                         {this.props.action.text}
-                        </Material.Button>
+                        </Button>
                     ) : undefined}
                 />
             );

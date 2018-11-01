@@ -1,7 +1,8 @@
 import * as React from 'react';
-import * as Material from '@material-ui/core';
 import { AppState } from './state';
 
+import BottomNavigation from '@material-ui/core/BottomNavigation';
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import Receipt from '@material-ui/icons/Receipt';
 import InsertChart from '@material-ui/icons/InsertChart';
 import Explicit from '@material-ui/icons/Explicit';
@@ -20,7 +21,7 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
 
     public render() {
         return (
-            <Material.BottomNavigation
+            <BottomNavigation
                 showLabels
                 value={this.props.state.workspace}
                 onChange={this.onChange}
@@ -31,15 +32,15 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
                     backgroundColor: '#EEEEEE',
                 }}
             >
-                <Material.BottomNavigationAction
+                <BottomNavigationAction
                     label="Document"
                     icon={<Receipt/>}
                 />
-                <Material.BottomNavigationAction
+                <BottomNavigationAction
                     label="Data"
                     icon={<InsertChart/>}
                 />
-                <Material.BottomNavigationAction
+                <BottomNavigationAction
                     label="Math"
                     icon={<Explicit/>}
                 />
@@ -47,7 +48,7 @@ extends React.Component<WorkspaceNav.Props, WorkspaceNav.State> {
                     label={this.props.unlocked ? "Lock workspace" : "Unlock workspace"}
                     icon={this.props.unlocked ? <Lock/> : <LockOpen/>}
                 />
-            </Material.BottomNavigation>
+            </BottomNavigation>
         );
     }
 }

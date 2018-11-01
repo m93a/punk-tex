@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AppState } from '../state';
-import { SvgIcon } from '@material-ui/core';
-import * as Icons from '@material-ui/icons';
+import SvgIcon from '@material-ui/core/SvgIcon';
+import TabIcon from '@material-ui/icons/Tab';
 
 abstract class Tab extends React.Component<Tab.Props>
 {
@@ -10,7 +10,7 @@ abstract class Tab extends React.Component<Tab.Props>
     }
 
     public static get icon(): typeof SvgIcon {
-        return Icons.Tab;
+        return TabIcon;
     }
 }
 

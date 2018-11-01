@@ -1,13 +1,13 @@
 import * as React from 'react';
-import * as Material from '@material-ui/core';
 
+import Button from '@material-ui/core/Button';
 import Add from '@material-ui/icons/Add';
 
 class TabAddButton
 extends React.Component<TabAddButton.Props, TabAddButton.State> {
     public render() {
         return (
-            <Material.Button
+            <Button
                 variant='fab'
                 style={{
                 zIndex: 10000,
@@ -18,7 +18,7 @@ extends React.Component<TabAddButton.Props, TabAddButton.State> {
                 color='secondary'
             >
                 <Add/>
-            </Material.Button>
+            </Button>
         );
     }
 }
