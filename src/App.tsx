@@ -2,7 +2,6 @@
 import * as React from 'react';
 import './styles/App.css';
 import state, { AppState } from './state';
-import Paper from '@material-ui/core/Paper';
 
 import Tab, * as Tabs     from './tab';
 import Session from './session';
@@ -17,6 +16,7 @@ const GridLayout = Grid.WidthProvider(Grid);
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import TabAddButton from './TabAddButton';
+import Window from './components/Window';
 
 state.tabs = [Tabs.Editor, Tabs.Preview];
 
@@ -77,16 +77,14 @@ class App extends React.Component<{}, App.State>
           }}
         >
         {workspaces[state.workspace].map(T => (
-          <Paper
+          <Window
+            id={T.i}
             key={T.i}
-            style={{
-              overflow: 'scroll',
-            }}
           >
             <T.type
               state={state}
             />
-          </Paper>
+          </Window>
         ))}
         </GridLayout>
         <TabAddButton/>
