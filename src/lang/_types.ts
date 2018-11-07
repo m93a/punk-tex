@@ -12,9 +12,18 @@ export type ReferenceStrings =
     etAl: string
 }
 
+
+import { EquationStringName } from '../tab/Equations';
+export type EquationStrings =
+{
+    [key in EquationStringName]: string
+}
+
+
 export interface Strings
 {
     reference: ReferenceStrings;
+    equation: EquationStrings;
 }
 
 export default Strings;

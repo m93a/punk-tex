@@ -30,7 +30,7 @@ export function changeLanguage(code: string): void
 
 export function ω(
     category: keyof Strings,
-    key: keyof Strings[keyof Strings]
+    key: string // TODO keyof Strings[keyof Strings]
 ): string
 {
     return state.strings[category][key];
@@ -38,7 +38,7 @@ export function ω(
 
 export class Ω extends React.Component<{
     c: keyof Strings,
-    k: keyof Strings[keyof Strings]
+    k: string // TODO keyof Strings[keyof Strings]
 }>
 {
     public render()

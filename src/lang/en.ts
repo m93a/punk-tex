@@ -19,6 +19,12 @@ const lang: Strings = {
         url: "URL address",
         online: "Primarily available online",
         referenced: "Date of citation"
+    },
+
+    equation: {
+        id: "ID",
+        code: "Math code",
+        tex: "LaTeX"
     }
 };
 

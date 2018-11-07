@@ -19,6 +19,12 @@ const lang: Strings = {
         url: "URL adresa",
         online: "Primárně dostupné online",
         referenced: "Datum citování"
+    },
+
+    equation: {
+        id: "ID",
+        code: "Kód rovnice",
+        tex: "LaTeX"
     }
 };
 

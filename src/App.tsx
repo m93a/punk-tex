@@ -36,7 +36,7 @@ const defaultLayout: ExtendedLayout[][] = [
     { i: 'References',  type: Tabs.References,  x: 6, y: 0, w: 6, h: 4 },
   ],
   [
-    { i: 'Equations', type: Tabs.Equations, x: 0, y: 0, w: 5, h: 4 },
+    { i: 'Equations', type: Tabs.EquationManager, x: 0, y: 0, w: 5, h: 4 },
   ],
 ];
 

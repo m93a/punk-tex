@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as math from 'mathjs';
 import * as TexZilla from 'texzilla';
 import { ui, editable, editable_, rendererArray } from '../lib/ui-decorators';
-import { Iterable, LambdaCache } from '../lib/react-helpers';
+import { Iterable, LambdaCache, hashObject } from '../lib/react-helpers';
 import { InternalError } from '../lib/react-helpers/Error';
 import Tab from './Tab';
 
@@ -11,11 +11,17 @@ import
     FaTimesCircle,
     FaRegBookmark,
     FaHashtag,
-    FaEquals
+    FaEquals,
+    FaRegEdit,
+    FaRegTrashAlt,
+    FaPlusCircle
 }
 from 'react-icons/fa';
 
-import state from '../state';
+import { AppState, state } from '../state';
+import { Ω } from 'src/lang';
+
+export type EquationStringName = 'id'|'code'|'tex';
 
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
@@ -24,52 +30,18 @@ type FocusEvent  = React.FocusEvent<HTMLInputElement>;
 
 
 
+
 /* * *
- * Buttons
+ * Controls: Editor
  * * */
 
 // #region
 
-class PasteEquation extends React.Component<React.SVGAttributes<SVGElement>>
-{
-    public render()
-    {
-        const props = Object.assign({ width: '1em', height: '1em' }, this.props);
-
-        return <svg {...props}>
-            <FaRegBookmark />
-            <FaEquals size='0.5em' x='0.25em' y='0.1em' />
-        </svg>
-    }
-}
-
-class PasteIndex extends React.Component<React.SVGAttributes<SVGElement>>
-{
-    public render()
-    {
-        const props = Object.assign({ width: '1em', height: '1em' }, this.props);
-
-        return <svg {...props}>
-            <FaRegBookmark  />
-            <FaHashtag size='0.5em' x='0.25em' y='0.1em' />
-        </svg>
-    }
-}
-
-// #endregion
-
-
-
-/* * *
- * Controls
- * * */
-
-// #region
-
+class ID {}
 class CODE {}
 class TEX {}
 
-type rendered = (update: ()=>void) => React.ReactNode;
+type rendered = (update: ()=>void) => React.ReactElement<{'data-key': EquationStringName}>;
 
 @ui(getRenderers())
 export class SerializedEquation
@@ -83,6 +55,7 @@ export class SerializedEquation
 
     // tslint:disable:member-access
 
+    @editable('string', ID) id: string = '';
     @editable('string', CODE) lhs: string = ''; rhs: string = '';
     @editable_('string', TEX) tex?: string;
 
@@ -99,7 +72,9 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
             (get, set, key, ref) =>
             (updateParent) =>
 
-                <input key={key}
+                <input
+                    key={key}
+                    data-key='code'
                     defaultValue={eqToCode(ref.lhs, ref.rhs)}
 
                     onBlur={cacheOrRetrieve(ref, 'code', 'blur', (e: FocusEvent) => e.target.value = `${ref.lhs} = ${ref.rhs}`)}
@@ -130,18 +105,20 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                 // až to budeš portovat do MaterialUI, přidej prosím na tenhle
                 // input takový to clear button, jako je u <input type=search />
 
-                <input key={key}
+                <input
+                    key={key}
+                    data-key={key}
                     placeholder={eqToTex(ref.lhs, ref.rhs)}
                     value={get()}
 
-                    onFocus={cacheOrRetrieve(ref, 'tex', 'focus',
+                    onFocus={cacheOrRetrieve(ref, key, 'focus',
                     (e: FocusEvent) =>
                     {
                         if(get()) return;
                         e.target.value = eqToTex(ref.lhs, ref.rhs);
                     })}
 
-                    onBlur={cacheOrRetrieve(ref, 'tex', 'blur',
+                    onBlur={cacheOrRetrieve(ref, key, 'blur',
                     (e: FocusEvent) =>
                     {
                         if (e.target.value === eqToTex(ref.lhs, ref.rhs))
@@ -151,13 +128,59 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                         }
                     })}
 
-                    onChange={cacheOrRetrieve(ref, 'tex', 'change',
+                    onChange={cacheOrRetrieve(ref, key, 'change',
                     (e: ChangeEvent) =>
                     {
                         set(e.target.value);
                     })}
                 />
 
+        ],
+
+
+
+
+        [
+            ['string', ID],
+            (get, set, key, ref) =>
+            (updateParent) =>
+            <input
+                key={key}
+                data-key={key}
+                defaultValue={ get() }
+
+                onChange={
+                    cacheOrRetrieve('change', ref, key, (e: ChangeEvent) =>
+                    {
+                        const id1 = get();
+                        const id2 = e.target.value;
+                        const eqns = state.equations;
+
+                        if (id2 !== id1 && eqns.has(id2))
+                        {
+                            e.target.setCustomValidity('Cannot change id – this identifier is already in use.');
+                            return;
+                        }
+                        else
+                        {
+                            e.target.setCustomValidity('');
+                        }
+
+                        set(id2);
+                        eqns.set(id2, ref);
+                        eqns.delete(id1);
+                        state.editingReference = id2;
+                        updateParent();
+                    })
+                }
+                onBlur={
+                    cacheOrRetrieve('blur', ref, key, (e: FocusEvent) =>
+                    {
+                        e.target.value = get();
+                        e.target.setCustomValidity('');
+                    })
+                }
+            />
         ]
     ];
 }
@@ -225,6 +248,168 @@ const codeToTex = (function()
 
 
 
+/* * *
+ * Controls: Buttons
+ * * */
+
+// #region
+
+const buttonClass =
+{
+    className: 'icon button'
+};
+const buttonParams =
+{
+    ...buttonClass,
+    size: '1.2em'
+};
+
+interface ButtonProps
+{
+    tab: EquationManager;
+    id: string;
+}
+
+
+class PasteEquationButton extends React.Component<ButtonProps>
+{
+    public render()
+    {
+        return <svg width='1em' height='1em' {...buttonParams} onClick={this.onClick}>
+            <FaRegBookmark />
+            <FaEquals size='0.5em' x='0.25em' y='0.1em' />
+        </svg>
+    }
+
+    public onClick = () =>
+    {
+        const index = state.pointToIndex(state.cursor);
+
+        state.content =
+            state.content.substring(0, index) +
+            "&eq(" + this.props.id + ")" +
+            state.content.substring(index);
+
+        state.dispatchEvent(
+            AppState.Event.ContentChange,
+            { source: this }
+        );
+    }
+}
+
+class PasteIndexButton extends React.Component<ButtonProps>
+{
+    public render()
+    {
+        return <svg width='1em' height='1em' {...buttonParams} onClick={this.onClick}>
+            <FaRegBookmark  />
+            <FaHashtag size='0.5em' x='0.25em' y='0.1em' />
+        </svg>
+    }
+
+    public onClick = () =>
+    {
+        const index = state.pointToIndex(state.cursor);
+
+        state.content =
+            state.content.substring(0, index) +
+            "&eqref(" + this.props.id + ")" +
+            state.content.substring(index);
+
+        state.dispatchEvent(
+            AppState.Event.ContentChange,
+            { source: this }
+        );
+    }
+}
+
+class EditEqButton extends React.Component<ButtonProps>
+{
+    public render()
+    {
+        return <FaRegEdit {...buttonParams} onClick={this.onClick} />;
+    }
+
+    public onClick = () =>
+    {
+        state.editingEquation = this.props.id;
+        this.props.tab.forceUpdate();
+        console.log(state);
+    }
+}
+
+class DeleteEqButton
+extends React.Component<ButtonProps>
+{
+    public render()
+    {
+        return <FaRegTrashAlt {...buttonParams} onClick={this.onClick} />;
+    }
+
+    public onClick = () =>
+    {
+        const id = this.props.id;
+
+        if (confirm("Opravdu chceš odstranit referenci ["+id+"]?"))
+        {
+            state.equations.delete(id);
+            this.props.tab.forceUpdate();
+        }
+    }
+}
+
+
+class NewEqButton
+extends React.Component<ButtonProps>
+{
+    public render()
+    {
+        return <FaPlusCircle {...buttonClass} onClick={this.onClick} />;
+    }
+
+    public onClick = () =>
+    {
+        let id: string;
+        do
+        {
+            id = 'equation-'+((Math.random()*1000)|0);
+        }
+        while(state.equations.has(id));
+
+        const ref: SerializedEquation =
+        {
+            id,
+            lhs: 'a',
+            rhs: 'b'
+        };
+
+        state.equations.set(id, ref);
+        state.editingReference = id;
+
+        this.props.tab.forceUpdate();
+    }
+}
+
+
+class CloseEditButton
+extends React.Component<ButtonProps>
+{
+    public render()
+    {
+        return <FaTimesCircle {...buttonClass} onClick={this.onClick} />;
+    }
+
+    public onClick = () =>
+    {
+        state.editingReference = undefined;
+        this.props.tab.forceUpdate();
+    }
+}
+
+// #endregion
+
+
+
 
 /* * *
  * Main
@@ -232,134 +417,98 @@ const codeToTex = (function()
 
 // #region
 
-class Equation extends React.Component<{eq: SerializedEquation, onClick: ()=>void}>
-{
-    public render()
-    {
-        const eq = this.props.eq;
-
-        return <span onClick={this.props.onClick} dangerouslySetInnerHTML={{
-                    __html: TexZilla.toMathMLString(
-                        eq.tex || (codeToTex(eq.lhs) + '=' + codeToTex(eq.rhs))
-                    )
-                }} />
-    }
-}
-
-class EquationEditor extends React.Component<{id: string, update: () => void}>
-{
-    private update = () => this.forceUpdate();
-    private closeEdit = () =>
-    {
-        state.editingEquation = undefined;
-        this.props.update();
-    };
-
-    public render()
-    {
-        return <p>
-            {
-                SerializedEquation
-                .render(state.equations.get(this.props.id)!) // render equation editor
-                .map(x => x(this.update)) // pass the update function to the UI
-            }
-            <FaTimesCircle className='icon button' onClick={this.closeEdit} />
-        </p>
-    }
-}
-
-
-
-class Equations extends Tab<{preview: boolean}>
+class EquationManager extends Tab<{preview: boolean}>
 {
     public static get title() { return 'Equations' };
 
-    private cacheOrRetrieve = LambdaCache();
     private update = () => this.forceUpdate();
-
-    /** Current code of the equation in the "add" field */
-    private currentEq: string = '';
-
-    /** Is the code in the "add" field valid? */
-    private valid = true;
 
     public render()
     {
-        return <div>
+        return <div className={this.props.preview ? 'preview' : ''}>
+
+            { !this.props.preview &&
+            <div className="ref-new">
+                <NewEqButton tab={this} id='' />
+                Nová reference
+            </div>
+            }
+
             {
-                Array.from(
-                    Iterable.map(state.equations.entries(),  ([id, eq]) =>
-                        this.renderRow(id, eq)
+                Array.from( Iterable.map(state.equations.entries(),
+                    ([id, eq]) =>
+                        this.props.preview
+                            ? this.renderPreview(id, eq)
+
+                        : state.editingReference === eq.id
+                            ? this.renderEditor(id, eq)
+                            : this.renderPreview(id, eq)
                     )
                 )
             }
-            { !this.props.preview &&
-            <p>
-                <input defaultValue={this.currentEq} onChange={this.validate} />
-                <button onClick={this.onAdd}>Add</button>
-            </p>
-            }
+
         </div>;
     }
 
-    private renderRow(id: string, eq: SerializedEquation)
+    private renderPreview(id: string, eq: SerializedEquation)
     {
-        return <p>
-            <PasteEquation />
-            <PasteIndex />
-            {` [${id}] `}
-            {
-                state.editingEquation === id ?
-                <EquationEditor key={id} id={id} update={this.update} /> :
-                <Equation key={id} eq={eq} onClick={this.setEditing(id)} />
+        const props = { tab: this, id };
+
+        const node =
+        <div key={hashObject(eq)} className="ref-body">
+
+            <PasteEquationButton {...props} />
+            <PasteIndexButton    {...props} />
+
+            {!this.props.preview &&
+            <>
+                <EditEqButton       {...props} />
+                <DeleteEqButton     {...props} />
+            </>
             }
-        </p>
+
+            <span>{`[${id}] `}</span>
+            <span dangerouslySetInnerHTML={{
+                __html: TexZilla.toMathMLString(
+                    eq.tex || (codeToTex(eq.lhs) + '=' + codeToTex(eq.rhs))
+                )
+            }} />
+        </div>;
+
+        return node;
     }
 
-    private validate = (e: React.ChangeEvent<HTMLInputElement>) =>
+
+
+    private renderEditor(id: string, eq: SerializedEquation)
     {
-        const code = e.target.value;
+        return (
+        <div key={hashObject(eq)} className="ref-edit">
 
-        const validity = validateCode(code);
-        e.target.setCustomValidity(validity);
-        this.valid = !validity;
+            <CloseEditButton tab={this} id='' />
+            <span className="ref-edit-title">Editace rovnice [{id}]</span>
 
-        if (!this.valid) return;
+            <table><tbody>
+            {
+                SerializedEquation
+                .render(state.equations.get(id)!) // render equation editor
+                .map(x => x(this.update)) // pass the update function to the UI
+                .map(el =>
+                    <tr key={el.props['data-key']}>
 
-        this.currentEq = code;
-        this.forceUpdate();
-    }
+                        <td><Ω c="equation" k={el.props['data-key']} /></td>
 
-    private setEditing = (id: string) =>
-    {
-        return this.cacheOrRetrieve(this, 'setEditing', id, () =>
-        {
-            if (this.props.preview) return;
+                        <td>{el}</td>
 
-            state.editingEquation = id;
-            this.forceUpdate();
-        })
-    };
-
-    private onAdd = () =>
-    {
-        if (!this.valid) return;
-
-        const [name, eq] = this.currentEq.split('=');
-        if (!name || !eq) return;
-
-        let id = '';
-        do
-        {
-            id = 'equation-'+Math.round(Math.random()*1000);
-        } while (state.equations.has(id));
-
-        state.equations.set(id, {lhs: name, rhs: eq});
-        this.currentEq = '';
-        this.forceUpdate();
+                    </tr>
+                )
+            }
+            </tbody></table>
+        </div>
+        );
     }
 }
 
-export default Equations;
+export default EquationManager;
 
 // #endregion
