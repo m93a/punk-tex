@@ -10,6 +10,7 @@ import { IndexOutOfRangeError } from './lib/react-helpers';
 
 import sampleText from './defaults/sampleText';
 import sampleReferences from './defaults/sampleReferences';
+import sampleEquations from './defaults/sampleEquations';
 
 export interface Point
 {
@@ -74,7 +75,7 @@ export const state: AppState =
     cursor: {row: 0, column: 0},
     cursorOnScreen: {row: 0, column: 0},
 
-    equations: new Map(), // id → code
+    equations: sampleEquations, // id → code
     quantities: new Map(), // id → Tex
 
     pointToIndex(point: Point)

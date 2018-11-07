@@ -489,7 +489,7 @@ extends React.Component<ButtonProps>
 
 // #region
 
-class ReferenceManager extends Tab
+class ReferenceManager extends Tab<{preview: boolean}>
 {
     public static get title() { return 'References'; }
     public static get icon() { return FormatQuote; }
@@ -502,20 +502,28 @@ class ReferenceManager extends Tab
 
     public render()
     {
-        return <div>
+        return <div className={this.props.preview ? 'preview' : ''}>
+
+            { !this.props.preview &&
             <div className="ref-new">
                 <NewRefButton tab={this} id='' />
                 Nová reference
             </div>
+            }
+
             {
                 Array.from( Iterable.map(state.references.values(),
                     r =>
-                        state.editingReference === r.id
-                        ? this.renderEditor(r)
-                        : this.renderPreview(r)
+                        this.props.preview
+                            ? this.renderPreview(r)
+
+                        : state.editingReference === r.id
+                            ? this.renderEditor(r)
+                            : this.renderPreview(r)
                     )
                 )
             }
+
         </div>;
     }
 
@@ -528,8 +536,13 @@ class ReferenceManager extends Tab
         <div key={hashObject(ref)} className="ref-body">
 
             <PasteCitationButton {...props} />
-            <EditRefButton       {...props} />
-            <DeleteRefButton     {...props} />
+
+            {!this.props.preview &&
+            <>
+                <EditRefButton       {...props} />
+                <DeleteRefButton     {...props} />
+            </>
+            }
 
             <span>{`[${id}] `}</span>
             <Reference {...ref} />

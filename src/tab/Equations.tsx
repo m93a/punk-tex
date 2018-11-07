@@ -4,8 +4,16 @@ import * as TexZilla from 'texzilla';
 import { ui, editable, editable_, rendererArray } from '../lib/ui-decorators';
 import { Iterable, LambdaCache } from '../lib/react-helpers';
 import { InternalError } from '../lib/react-helpers/Error';
-import { FaTimesCircle } from 'react-icons/fa';
 import Tab from './Tab';
+
+import
+{
+    FaTimesCircle,
+    FaRegBookmark,
+    FaHashtag,
+    FaEquals
+}
+from 'react-icons/fa';
 
 import state from '../state';
 
@@ -13,6 +21,42 @@ import state from '../state';
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type FocusEvent  = React.FocusEvent<HTMLInputElement>;
 
+
+
+
+/* * *
+ * Buttons
+ * * */
+
+// #region
+
+class PasteEquation extends React.Component<React.SVGAttributes<SVGElement>>
+{
+    public render()
+    {
+        const props = Object.assign({ width: '1em', height: '1em' }, this.props);
+
+        return <svg {...props}>
+            <FaRegBookmark />
+            <FaEquals size='0.5em' x='0.25em' y='0.1em' />
+        </svg>
+    }
+}
+
+class PasteIndex extends React.Component<React.SVGAttributes<SVGElement>>
+{
+    public render()
+    {
+        const props = Object.assign({ width: '1em', height: '1em' }, this.props);
+
+        return <svg {...props}>
+            <FaRegBookmark  />
+            <FaHashtag size='0.5em' x='0.25em' y='0.1em' />
+        </svg>
+    }
+}
+
+// #endregion
 
 
 
@@ -194,13 +238,11 @@ class Equation extends React.Component<{eq: SerializedEquation, onClick: ()=>voi
     {
         const eq = this.props.eq;
 
-        return <p>
-            <span onClick={this.props.onClick} dangerouslySetInnerHTML={{
-                __html: TexZilla.toMathMLString(
-                    eq.tex || (codeToTex(eq.lhs) + '=' + codeToTex(eq.rhs))
-                )
-            }} />
-        </p>
+        return <span onClick={this.props.onClick} dangerouslySetInnerHTML={{
+                    __html: TexZilla.toMathMLString(
+                        eq.tex || (codeToTex(eq.lhs) + '=' + codeToTex(eq.rhs))
+                    )
+                }} />
     }
 }
 
@@ -228,7 +270,7 @@ class EquationEditor extends React.Component<{id: string, update: () => void}>
 
 
 
-class Equations extends Tab
+class Equations extends Tab<{preview: boolean}>
 {
     public static get title() { return 'Equations' };
 
@@ -247,17 +289,31 @@ class Equations extends Tab
             {
                 Array.from(
                     Iterable.map(state.equations.entries(),  ([id, eq]) =>
-                        state.editingEquation === id ?
-                        <EquationEditor key={id} id={id} update={this.update} /> :
-                        <Equation key={id} eq={eq} onClick={this.setEditing(id)} />
+                        this.renderRow(id, eq)
                     )
                 )
             }
+            { !this.props.preview &&
             <p>
                 <input defaultValue={this.currentEq} onChange={this.validate} />
                 <button onClick={this.onAdd}>Add</button>
             </p>
+            }
         </div>;
+    }
+
+    private renderRow(id: string, eq: SerializedEquation)
+    {
+        return <p>
+            <PasteEquation />
+            <PasteIndex />
+            {` [${id}] `}
+            {
+                state.editingEquation === id ?
+                <EquationEditor key={id} id={id} update={this.update} /> :
+                <Equation key={id} eq={eq} onClick={this.setEditing(id)} />
+            }
+        </p>
     }
 
     private validate = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -278,6 +334,8 @@ class Equations extends Tab
     {
         return this.cacheOrRetrieve(this, 'setEditing', id, () =>
         {
+            if (this.props.preview) return;
+
             state.editingEquation = id;
             this.forceUpdate();
         })

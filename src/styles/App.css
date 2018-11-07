@@ -89,6 +89,13 @@ html, body, #root, .App {
   padding-bottom: 2em;
 }
 
+.preview > .ref-body {
+  height: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-bottom: 0.5em;
+}
+
 .ref-edit-title {
   font-weight: bold;
 }

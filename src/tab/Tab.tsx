@@ -3,7 +3,9 @@ import { AppState } from '../state';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import TabIcon from '@material-ui/icons/Tab';
 
-abstract class Tab extends React.Component<Tab.Props>
+type Optional<T> = { [K in keyof T]?: T[K] };
+
+abstract class Tab<T = {}> extends React.Component<Tab.Props & Optional<T>>
 {
     public static get title(): string {
         throw Error('Tab.title is an abstract property that cannot be accessed on base class');
