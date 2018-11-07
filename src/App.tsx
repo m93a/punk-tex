@@ -27,9 +27,10 @@ extends Grid.Layout {
 
 const defaultLayout: ExtendedLayout[][] = [
   [
-    { i: 'RefPreview', type: Tabs.ReferencePreview, x: 0, y: 1, w: 5, h: 1 },
+    { i: 'RefPreview', type: Tabs.ReferencePreview, x: 0, y: 0, w: 4, h: 1 },
+    { i: 'EqnPreview', type: Tabs.EquationPreview,  x: 4, y: 0, w: 3, h: 1 },
     { i: 'Editor',     type: Tabs.Editor,           x: 0, y: 1, w: 5, h: 7 },
-    { i: 'Preview',    type: Tabs.Preview,          x: 5, y: 0, w: 7, h: 8 },
+    { i: 'Preview',    type: Tabs.Preview,          x: 5, y: 1, w: 7, h: 8 },
   ],
   [
     { i: 'DataManager', type: Tabs.DataManager, x: 0, y: 0, w: 6, h: 4 },

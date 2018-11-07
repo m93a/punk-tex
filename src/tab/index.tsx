@@ -8,6 +8,7 @@ export { default as EquationManager } from './Equations';
 export { default as DataManager } from './DataManager';
 
 export { default as ReferencePreview } from './ReferencePreview';
+export { default as EquationPreview } from './EquationPreview';
 
-import {Editor, Preview, References, EquationManager, DataManager, ReferencePreview} from '.';
-export const available: (typeof Tab)[] = [Editor, Preview, References, EquationManager, DataManager, ReferencePreview];
+import {Editor, Preview, References, EquationManager, DataManager, ReferencePreview, EquationPreview} from '.';
+export const available: (typeof Tab)[] = [Editor, Preview, References, EquationManager, DataManager, ReferencePreview, EquationPreview];

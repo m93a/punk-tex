@@ -169,7 +169,7 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                         set(id2);
                         eqns.set(id2, ref);
                         eqns.delete(id1);
-                        state.editingReference = id2;
+                        state.editingEquation = id2;
                         updateParent();
                     })
                 }
@@ -333,7 +333,7 @@ class EditEqButton extends React.Component<ButtonProps>
     public onClick = () =>
     {
         state.editingEquation = this.props.id;
-        this.props.tab.forceUpdate();
+        this.props.tab.update();
         console.log(state);
     }
 }
@@ -353,7 +353,7 @@ extends React.Component<ButtonProps>
         if (confirm("Opravdu chceš odstranit referenci ["+id+"]?"))
         {
             state.equations.delete(id);
-            this.props.tab.forceUpdate();
+            this.props.tab.update();
         }
     }
 }
@@ -384,9 +384,9 @@ extends React.Component<ButtonProps>
         };
 
         state.equations.set(id, ref);
-        state.editingReference = id;
+        state.editingEquation = id;
 
-        this.props.tab.forceUpdate();
+        this.props.tab.update();
     }
 }
 
@@ -401,8 +401,8 @@ extends React.Component<ButtonProps>
 
     public onClick = () =>
     {
-        state.editingReference = undefined;
-        this.props.tab.forceUpdate();
+        state.editingEquation = undefined;
+        this.props.tab.update();
     }
 }
 
@@ -421,7 +421,11 @@ class EquationManager extends Tab<{preview: boolean}>
 {
     public static get title() { return 'Equations' };
 
-    private update = () => this.forceUpdate();
+    public update = () =>
+    {
+        console.log(state.editingEquation);
+        this.forceUpdate();
+    }
 
     public render()
     {
@@ -440,7 +444,7 @@ class EquationManager extends Tab<{preview: boolean}>
                         this.props.preview
                             ? this.renderPreview(id, eq)
 
-                        : state.editingReference === eq.id
+                        : state.editingEquation === eq.id
                             ? this.renderEditor(id, eq)
                             : this.renderPreview(id, eq)
                     )
@@ -467,7 +471,7 @@ class EquationManager extends Tab<{preview: boolean}>
             </>
             }
 
-            <span>{`[${id}] `}</span>
+            <span onClick={this.update}>{`[${id}] `}</span>
             <span dangerouslySetInnerHTML={{
                 __html: TexZilla.toMathMLString(
                     eq.tex || (codeToTex(eq.lhs) + '=' + codeToTex(eq.rhs))
