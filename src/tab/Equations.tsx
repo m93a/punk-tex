@@ -1,17 +1,192 @@
 import * as React from 'react';
 import * as math from 'mathjs';
 import * as TexZilla from 'texzilla';
-import { Iterable } from '../lib/react-helpers';
+import { ui, editable, editable_, rendererArray } from '../lib/ui-decorators';
+import { Iterable, LambdaCache } from '../lib/react-helpers';
+import { InternalError } from '../lib/react-helpers/Error';
+import { FaTimesCircle } from 'react-icons/fa';
 import Tab from './Tab';
 
 import state from '../state';
 
-export interface SerializedEquation
+
+type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
+type FocusEvent  = React.FocusEvent<HTMLInputElement>;
+
+
+
+
+/* * *
+ * Controls
+ * * */
+
+// #region
+
+class CODE {}
+class TEX {}
+
+type rendered = (update: ()=>void) => React.ReactNode;
+
+@ui(getRenderers())
+export class SerializedEquation
 {
-    lhs: string;
-    rhs: string;
-    tex?: string;
+    public static render(eqn: SerializedEquation): rendered[]
+    {
+        throw new InternalError(
+            "The static 'render' method wasn't correctly overriden. This shouldn't have happened."
+        );
+    }
+
+    // tslint:disable:member-access
+
+    @editable('string', CODE) lhs: string = ''; rhs: string = '';
+    @editable_('string', TEX) tex?: string;
+
+    // tslint:enable:member-access
 }
+
+function getRenderers(): rendererArray<rendered, SerializedEquation>
+{
+    const cacheOrRetrieve = LambdaCache();
+
+    return [
+        [
+            ['string', CODE],
+            (get, set, key, ref) =>
+            (updateParent) =>
+
+                <input key={key}
+                    defaultValue={eqToCode(ref.lhs, ref.rhs)}
+
+                    onBlur={cacheOrRetrieve(ref, 'code', 'blur', (e: FocusEvent) => e.target.value = `${ref.lhs} = ${ref.rhs}`)}
+
+                    onChange={cacheOrRetrieve(ref, 'code', 'click',
+                    (e: ChangeEvent) =>
+                    {
+                        const code = e.target.value;
+                        const validity = validateCode(code);
+                        e.target.setCustomValidity(validity);
+
+                        if (!validity)
+                        {
+                            [ref.lhs, ref.rhs] = code.split('=').map(s => s.trim());
+                            updateParent();
+                        }
+                    })}
+                />
+
+        ],
+
+        [
+            ['string', TEX],
+            (get, set, key, ref) =>
+            (updateParent) =>
+
+                // ! @RisaI
+                // až to budeš portovat do MaterialUI, přidej prosím na tenhle
+                // input takový to clear button, jako je u <input type=search />
+
+                <input key={key}
+                    placeholder={eqToTex(ref.lhs, ref.rhs)}
+                    value={get()}
+
+                    onFocus={cacheOrRetrieve(ref, 'tex', 'focus',
+                    (e: FocusEvent) =>
+                    {
+                        if(get()) return;
+                        e.target.value = eqToTex(ref.lhs, ref.rhs);
+                    })}
+
+                    onBlur={cacheOrRetrieve(ref, 'tex', 'blur',
+                    (e: FocusEvent) =>
+                    {
+                        if (e.target.value === eqToTex(ref.lhs, ref.rhs))
+                        {
+                            set(undefined);
+                            e.target.value = '';
+                        }
+                    })}
+
+                    onChange={cacheOrRetrieve(ref, 'tex', 'change',
+                    (e: ChangeEvent) =>
+                    {
+                        set(e.target.value);
+                    })}
+                />
+
+        ]
+    ];
+}
+
+function validateCode(code: string)
+{
+
+    if (!code.includes('='))
+    {
+        return 'The equation doesn\'t contain the `=` sign.';
+    }
+    else
+    {
+        let failed: boolean = false;
+
+        try
+        {
+            const [lhs, rhs] = code.split('=');
+            math.parse(rhs);
+            failed = !math.parse(lhs).isSymbolNode;
+        }
+        catch(err){
+            return (err as Error).message;
+        }
+
+        if(failed)
+        {
+            return 'The LHS has to be a variable.';
+        }
+        else
+        {
+            return '';
+        }
+    }
+}
+
+function eqToCode(lhs: string, rhs: string)
+{
+    return `${lhs.trim()} = ${rhs.trim()}`;
+}
+
+function eqToTex(lhs: string, rhs: string)
+{
+    return `${codeToTex(lhs.trim()).trim()} = ${codeToTex(rhs.trim()).trim()}`;
+}
+
+const codeToTex = (function()
+{
+    let lastCode: string = '';
+    let lastTex: string = '';
+
+    return function(code: string)
+    {
+        if (code === lastCode) return lastTex;
+
+        lastTex = math.parse(code).toTex();
+        lastCode = code; // if parse() doesn't throw
+
+        return lastTex;
+    }
+})();
+
+// #endregion
+
+
+
+
+
+/* * *
+ * Main
+ * * */
+
+// #region
 
 class Equation extends React.Component<{eq: SerializedEquation, onClick: ()=>void}>
 {
@@ -21,73 +196,91 @@ class Equation extends React.Component<{eq: SerializedEquation, onClick: ()=>voi
 
         return <p>
             <span onClick={this.props.onClick} dangerouslySetInnerHTML={{
-                __html: eq.tex || TexZilla.toMathMLString(
-                    math.parse(eq.lhs).toTex() + '=' + math.parse(eq.rhs).toTex()
+                __html: TexZilla.toMathMLString(
+                    eq.tex || (codeToTex(eq.lhs) + '=' + codeToTex(eq.rhs))
                 )
             }} />
         </p>
     }
 }
 
+class EquationEditor extends React.Component<{id: string, update: () => void}>
+{
+    private update = () => this.forceUpdate();
+    private closeEdit = () =>
+    {
+        state.editingEquation = undefined;
+        this.props.update();
+    };
+
+    public render()
+    {
+        return <p>
+            {
+                SerializedEquation
+                .render(state.equations.get(this.props.id)!) // render equation editor
+                .map(x => x(this.update)) // pass the update function to the UI
+            }
+            <FaTimesCircle className='icon button' onClick={this.closeEdit} />
+        </p>
+    }
+}
+
+
+
 class Equations extends Tab
 {
     public static get title() { return 'Equations' };
 
+    private cacheOrRetrieve = LambdaCache();
+    private update = () => this.forceUpdate();
+
+    /** Current code of the equation in the "add" field */
     private currentEq: string = '';
+
+    /** Is the code in the "add" field valid? */
     private valid = true;
 
     public render()
     {
         return <div>
             {
-                Iterable.map(state.equations.entries(),  ([id, eq], i) =>
-                    <Equation key={id} eq={eq} onClick={this.onClick} />
+                Array.from(
+                    Iterable.map(state.equations.entries(),  ([id, eq]) =>
+                        state.editingEquation === id ?
+                        <EquationEditor key={id} id={id} update={this.update} /> :
+                        <Equation key={id} eq={eq} onClick={this.setEditing(id)} />
+                    )
                 )
             }
             <p>
-                <input value={this.currentEq} onChange={this.onChange} />
+                <input defaultValue={this.currentEq} onChange={this.validate} />
                 <button onClick={this.onAdd}>Add</button>
             </p>
         </div>;
     }
 
-    private onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    private validate = (e: React.ChangeEvent<HTMLInputElement>) =>
     {
-        const value = e.target.value;
-        this.valid = false;
+        const code = e.target.value;
 
-        if (!value.includes('='))
-        {
-            e.target.setCustomValidity('The equation doesn\'t contain the `=` sign.');
-        }
-        else
-        {
-            let failed: boolean = false;
+        const validity = validateCode(code);
+        e.target.setCustomValidity(validity);
+        this.valid = !validity;
 
-            try
-            {
-                failed = !!math.parse(value.split('=')[0]).isSymbolNode;
-            }
-            catch(F){}
+        if (!this.valid) return;
 
-            if(failed)
-            {
-                e.target.setCustomValidity('The LHS has to be a variable and RHS a valid expression.');
-            }
-            else
-            {
-                e.target.setCustomValidity('');
-                this.valid = true;
-            }
-        }
-
-        this.currentEq = value;
+        this.currentEq = code;
         this.forceUpdate();
     }
 
-    private onClick = () =>
+    private setEditing = (id: string) =>
     {
-
+        return this.cacheOrRetrieve(this, 'setEditing', id, () =>
+        {
+            state.editingEquation = id;
+            this.forceUpdate();
+        })
     };
 
     private onAdd = () =>
@@ -110,3 +303,5 @@ class Equations extends Tab
 }
 
 export default Equations;
+
+// #endregion

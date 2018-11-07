@@ -66,8 +66,8 @@ function isSetUp(ctor: ClassConstructor): ctor is RenderableClass<unknown>
 
 export type typeIndicators = typeIndicator[];
 
-export type renderer<T, X> = (get: () => T, set: (value: T) => void, key: string, self: any) => X;
-export type rendererArray<X> = Array<[typeIndicators, renderer<any, X>]>; // FIXME do more type-checking
+export type renderer<T, X, O = any> = (get: () => T, set: (value: T) => void, key: string, self: O) => X;
+export type rendererArray<X, O = any> = Array<[typeIndicators, renderer<any, X, O>]>; // FIXME do more type-checking
 
 export type render<X> = () => X[];
 export type staticRender<T, X> = (self: T) => X[];
@@ -201,6 +201,21 @@ export function editable<T extends typeIndicators>(...type: T)
 }
 
 
+/**
+ * Exactly like `@editable`, but for optional parameters.
+ * @see editable
+ */
+export function editable_<T extends typeIndicators>(...type: T)
+{
+    return function<C extends { [a in K]?: fromTypeIndicators<T> }, K extends string>(target: C, key: K)
+    {
+        if (!target[TEMP]) target[TEMP] = [];
+
+        (target[TEMP] as Temp).push({ type, key });
+    }
+}
+
+
 
 function matchRenderers<X>(target: RenderableClass<X>, renderers: rendererArray<X>)
 {
@@ -259,6 +274,8 @@ function matchRenderers<X>(target: RenderableClass<X>, renderers: rendererArray<
 
 ui.isSetUp  = isSetUp;
 ui.editable = editable;
+ui.editable_ = editable_;
+editable._ = editable_;
 
 export default ui;
 
