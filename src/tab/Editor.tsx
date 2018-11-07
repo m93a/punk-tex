@@ -31,7 +31,7 @@ export default class Editor extends Tab
             editorProps={{$blockScrolling: false}}
             wrapEnabled
             height="100%"
-            width="100%"
+            width="95%"
             value={this.props.state.content}
         />;
     }
