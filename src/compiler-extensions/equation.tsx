@@ -44,6 +44,9 @@ export default function insertPlugin(md: MarkdownIt, appState: AppState)
         const tex = eq.tex ||
                 `${math.parse(eq.lhs).toTex()} = ${math.parse(eq.rhs).toTex()}`;
 
+
+        console.log(toMathMLString(tex));
+
         return (
             <span className='eqn-body' dangerouslySetInnerHTML={{
                 __html: toMathMLString(tex)

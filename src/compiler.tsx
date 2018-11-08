@@ -2,7 +2,7 @@
 import * as MarkdownIt from 'markdown-it';
 import * as IncrementalDOM from './lib/incremental-dom';
 import mdIncrementalDOM from 'markdown-it-incremental-dom';
-import * as TexZilla from 'texzilla';
+import texToMathML from './lib/LaTeX2MathML';
 import mdMath from 'markdown-it-math';
 import mdReplace from 'markdown-it-replacements';
 
@@ -28,10 +28,10 @@ md.use(
 	mdMath,
 	{
 		inlineRenderer(str: string) {
-			return TexZilla.toMathMLString(str);
+			return texToMathML(str);
 		},
 		blockRenderer(str: string) {
-			return TexZilla.toMathMLString(str, true);
+			return texToMathML(str, true);
 		}
 	}
 );

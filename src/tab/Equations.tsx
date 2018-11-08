@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as math from 'mathjs';
-import * as TexZilla from 'texzilla';
 import { ui, editable, editable_, rendererArray } from '../lib/ui-decorators';
 import { Iterable, LambdaCache, hashObject } from '../lib/react-helpers';
 import { InternalError } from '../lib/react-helpers/Error';
+import parseTex from '../lib/LaTeX2MathML';
 import Tab from './Tab';
 
 import
@@ -109,7 +109,7 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                     key={key}
                     data-key={key}
                     placeholder={eqToTex(ref.lhs, ref.rhs)}
-                    value={get()}
+                    defaultValue={get()}
 
                     onFocus={cacheOrRetrieve(ref, key, 'focus',
                     (e: FocusEvent) =>
@@ -132,6 +132,7 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                     (e: ChangeEvent) =>
                     {
                         set(e.target.value);
+                        updateParent();
                     })}
                 />
 
@@ -334,7 +335,6 @@ class EditEqButton extends React.Component<ButtonProps>
     {
         state.editingEquation = this.props.id;
         this.props.tab.update();
-        console.log(state);
     }
 }
 
@@ -473,7 +473,7 @@ class EquationManager extends Tab<{preview: boolean}>
 
             <span onClick={this.update}>{`[${id}] `}</span>
             <span dangerouslySetInnerHTML={{
-                __html: TexZilla.toMathMLString(
+                __html: parseTex(
                     eq.tex || (codeToTex(eq.lhs) + '=' + codeToTex(eq.rhs))
                 )
             }} />

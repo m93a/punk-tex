@@ -4,6 +4,7 @@ import Reference from './structures/Reference';
 import LangStrings from './lang/_types';
 import { loadLang } from './lang';
 import { SerializedEquation } from './tab/Equations';
+import { Data } from './structures/Data';
 
 import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';
 import { IndexOutOfRangeError } from './lib/react-helpers';
@@ -18,6 +19,9 @@ export interface Point
     column: number;
 }
 
+type id = string;
+type tex = string;
+
 export interface AppState
 extends EventTarget<AppState.Event>
 {
@@ -28,12 +32,14 @@ extends EventTarget<AppState.Event>
 
     tabs: (typeof Tab)[];
     content: string;
-    references: Map<string, Reference.Params>;
+
+    references: Map<id, Reference.Params>;
+    equations:  Map<id, SerializedEquation>;
+    quantities: Map<id, tex>;
+    data: Map<id, Data>;
+
     editingReference?: string;
     editingEquation?: string;
-
-    equations:  Map</** id */string, SerializedEquation>;
-    quantities: Map</** id */string, /** tex */string>;
 
     cursor: Point;
     cursorOnScreen: Point;
@@ -75,8 +81,9 @@ export const state: AppState =
     cursor: {row: 0, column: 0},
     cursorOnScreen: {row: 0, column: 0},
 
-    equations: sampleEquations, // id → code
-    quantities: new Map(), // id → Tex
+    equations: sampleEquations,
+    quantities: new Map(),
+    data: new Map(),
 
     pointToIndex(point: Point)
     {
