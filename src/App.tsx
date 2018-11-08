@@ -97,7 +97,7 @@ class App extends React.Component<{}, App.State>
           onToggleLock={this.toggleLock}
         />
         <NotificationManager/>
-        <audio src='/punk.wav' id='audio-start' autoPlay/>
+        <audio src='/punk.ogg' id='audio-start' autoPlay/>
       </div>
     );
   }
