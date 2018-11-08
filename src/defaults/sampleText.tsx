@@ -15,6 +15,13 @@ Tohle je vědecká práce&cite(mljs-lm). Fortran smrdí&cite(recipes-fortran-77)
 
 3. Zobrazte na osciloskopu V–A charakteristiku vakuové diody EZ81 a Zenerovy diody KZ703 podle schématu připojeného k úloze. Orientačně načrtněte pozorované charakteristiky a vyznačte měřítka na osách. Odhadněte napětí na diodách při proudu 20 mA v propustném směru. Určete Zenerovo napětí.
 
+
+# Teorie
+Při zpracování budu potřebovat časovou konstantu $$\\tau$$. Tu vypočítám pomocí této rovnice:
+&Eq(tau)
+Na tuto rovnici můžu klidně i odkázat, když chci, hele: &eqref(tau).
+
+
 # Výsledky měření
 <div style="text-align: center">
     <img src="https://i.imgur.com/aWTSfn8.png" />

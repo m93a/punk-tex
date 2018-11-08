@@ -287,7 +287,7 @@ class PasteEquationButton extends React.Component<ButtonProps>
 
         state.content =
             state.content.substring(0, index) +
-            "&eq(" + this.props.id + ")" +
+            "&Eq(" + this.props.id + ")" +
             state.content.substring(index);
 
         state.dispatchEvent(

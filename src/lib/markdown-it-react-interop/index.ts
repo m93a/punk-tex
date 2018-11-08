@@ -68,14 +68,25 @@ export function renderAsInlineToken(state: MD.StateInline, node: React.ReactNode
 
             let token: MD.Token;
 
-            if (typeof children === 'undefined' || typeof children === 'boolean' || children === null)
+            if (!node.props.dangerouslySetInnerHTML)
             {
-                token = state.push(node.type, node.type, 0);
+                if (typeof children === 'undefined' || typeof children === 'boolean' || children === null)
+                {
+                    token = state.push(node.type, node.type, 0);
+                }
+                else
+                {
+                    token = state.push(node.type + '_open', node.type, 1);
+                    renderAsInlineToken(state, children);
+                    state.push(node.type + '_close', node.type, -1);
+                }
             }
             else
             {
+                // dangerously set inner HTML
                 token = state.push(node.type + '_open', node.type, 1);
-                renderAsInlineToken(state, children);
+                const innerHTML = state.push('html_inline', '', 0);
+                innerHTML.content = node.props.dangerouslySetInnerHTML.__html;
                 state.push(node.type + '_close', node.type, -1);
             }
 
@@ -83,7 +94,7 @@ export function renderAsInlineToken(state: MD.StateInline, node: React.ReactNode
             {
                 if (key === 'dangerouslySetInnerHTML')
                 {
-                    throw Error('Property dangerouslySetInnerHTML has not been implemented yet');
+                    continue;
                 }
                 else if (key === 'className')
                 {

@@ -28,7 +28,7 @@ export default class Editor extends Tab
             fontSize={16}
             ref={this.mainControl}
             onChange={this.onInternalChange}
-            editorProps={{$blockScrolling: false}}
+            editorProps={{$blockScrolling: true}}
             wrapEnabled
             height="100%"
             width="95%"

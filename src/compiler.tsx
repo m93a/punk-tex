@@ -9,6 +9,7 @@ import mdReplace from 'markdown-it-replacements';
 import { state, AppState } from './state';
 import references from './compiler-extensions/cite';
 import punktex from './compiler-extensions/punktex';
+import equation from './compiler-extensions/equation';
 
 const md = MarkdownIt({
 	breaks: false,
@@ -27,9 +28,7 @@ md.use(
 	mdMath,
 	{
 		inlineRenderer(str: string) {
-			const result = TexZilla.toMathMLString(str);
-			console.log(result);
-			return result;
+			return TexZilla.toMathMLString(str);
 		},
 		blockRenderer(str: string) {
 			return TexZilla.toMathMLString(str, true);
@@ -56,6 +55,7 @@ md.use(
 md.use(mdReplace);
 
 md.use(references, state);
+md.use(equation, state);
 md.use(punktex);
 
 
