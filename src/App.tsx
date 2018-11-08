@@ -97,6 +97,7 @@ class App extends React.Component<{}, App.State>
           onToggleLock={this.toggleLock}
         />
         <NotificationManager/>
+        <audio src='/punk.wav' id='audio-start' autoPlay/>
       </div>
     );
   }
@@ -108,6 +109,8 @@ class App extends React.Component<{}, App.State>
 
   public componentDidMount()
   {
+    const elem = document.getElementById('audio-start') as HTMLAudioElement;
+    elem.play();
     state.addEventListener(AppState.Event.TabChange, this.update);
     this.checkLogin();
   }
