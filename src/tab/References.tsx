@@ -7,7 +7,7 @@
 
 // Frameworks
 import * as React from 'react';
-import ui, { editable, rendererArray, staticRender } from '../lib/ui-decorators';
+import ui, { editable, RendererList } from '../lib/ui-decorators';
 
 
 import Tab from './Tab';
@@ -18,7 +18,7 @@ import Reference from '../structures/Reference';
 import { Ω } from '../lang';
 
 // Utilities
-import { Required_ish, Event, Iterable, LambdaCache, hashObject } from "../lib/react-helpers";
+import { Explicit, Event, Iterable, LambdaCache, hashObject } from "../lib/react-helpers";
 import FormatQuote from '@material-ui/icons/FormatQuote';
 
 // Resources
@@ -70,12 +70,12 @@ function genRenderable<X>(self: ReferenceManager)
 {
     const renderers = genRenderers(self);
 
-    @ui(renderers)
-    class RenderableParamsClass implements Required_ish<Reference.Params>
+    @ui({edit: renderers})
+    class RenderableParamsClass implements Explicit<Reference.Params>
     {
         // tslint:disable:member-access
 
-        static render = 0 as any as staticRender<Reference.Params, renderType>;
+        static renderEditor = 0 as any;
 
         @editable('string', ID) id = '';
 
@@ -101,7 +101,7 @@ function genRenderable<X>(self: ReferenceManager)
     return RenderableParamsClass;
 }
 
-function genRenderers(tab: ReferenceManager): rendererArray<renderType>
+function genRenderers(tab: ReferenceManager): RendererList<renderType>
 {
     const cacheOrRetrieve = LambdaCache();
 
@@ -373,7 +373,6 @@ extends React.Component<ButtonProps>
 {
     public render()
     {
-        // tslint:disable-next-line:jsx-no-bind
         return <FaRegBookmark {...buttonParams} onClick={this.onClick} />;
     }
 
@@ -561,7 +560,7 @@ class ReferenceManager extends Tab<{preview: boolean}>
 
             <table><tbody>
             {
-                this.RenderableEditor.render(ref).map(el =>
+                this.RenderableEditor.renderEditor(ref).map((el: any) =>
                     <tr key={el.props['data-key']}>
 
                         <td><Ω c="reference" k={el.props['data-key']} /></td>

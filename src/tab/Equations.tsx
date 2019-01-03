@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as math from 'mathjs';
-import { ui, editable, editable_, rendererArray } from '../lib/ui-decorators';
+import { ui, editable, editable_, RendererList } from '../lib/ui-decorators';
 import { Iterable, LambdaCache, hashObject } from '../lib/react-helpers';
 import { InternalError } from '../lib/react-helpers/Error';
 import parseTex from '../lib/LaTeX2MathML';
@@ -43,10 +43,10 @@ class TEX {}
 
 type rendered = (update: ()=>void) => React.ReactElement<{'data-key': EquationStringName}>;
 
-@ui(getRenderers())
+@ui({edit: getRenderers()})
 export class SerializedEquation
 {
-    public static render(eqn: SerializedEquation): rendered[]
+    public static renderEditor(eqn: SerializedEquation): rendered[]
     {
         throw new InternalError(
             "The static 'render' method wasn't correctly overriden. This shouldn't have happened."
@@ -57,12 +57,12 @@ export class SerializedEquation
 
     @editable('string', ID) id: string = '';
     @editable('string', CODE) lhs: string = ''; rhs: string = '';
-    @editable_('string', TEX) tex?: string;
+    @editable_('string', 'undefined', TEX) tex?: string;
 
     // tslint:enable:member-access
 }
 
-function getRenderers(): rendererArray<rendered, SerializedEquation>
+function getRenderers(): RendererList<rendered, SerializedEquation>
 {
     const cacheOrRetrieve = LambdaCache();
 
@@ -97,7 +97,7 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
         ],
 
         [
-            ['string', TEX],
+            ['string', 'undefined', TEX],
             (get, set, key, ref) =>
             (updateParent) =>
 
@@ -495,7 +495,7 @@ class EquationManager extends Tab<{preview: boolean}>
             <table><tbody>
             {
                 SerializedEquation
-                .render(state.equations.get(id)!) // render equation editor
+                .renderEditor(state.equations.get(id)!) // render equation editor
                 .map(x => x(this.update)) // pass the update function to the UI
                 .map(el =>
                     <tr key={el.props['data-key']}>
