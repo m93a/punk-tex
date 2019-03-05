@@ -19,7 +19,7 @@ type fromTypeString<name extends typeString> =
 type fromTypeIndicator<T extends typeIndicator> =
     T extends typeString
     ? fromTypeString<T>
-    : T extends {new (...p: any[]): infer C} ? C : never;
+    : T extends new (...p: any[]) => infer C ? C : never;
 
 type typeArrayfromTypeIndicators<T extends typeIndicators> = {
     [K in number]: fromTypeIndicator<T[K]>

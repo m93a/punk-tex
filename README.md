@@ -8,21 +8,20 @@ You can try a [live demo](http://punktex.g6.cz/) of punkTex.
 ```
 git clone https://github.com/m93a/punk-tex
 cd punk-tex
-npm i
-npm start
+yarn
+yarn start
 ```
 
 ## Syntax
 The PunkTEX syntax is based on [Markdown](https://commonmark.org/help/) with some extensions.
 
 ### Equations
-You can write LaTEX equations enclosed in `$$` for inline equation and `$$$` for a block equation.
+You can write LaTeX equations enclosed in `$$` for inline equation and `$$$` for a block equation.
 
 ```markdown
-Skrrat, skidi-kat-kat <br>
-Boom <br>
-$$2 + 2 = 4$$, minus one that's three, quick maths <br>
-Everyday man's on the block, smoke trees <br>
+And hence we see, that indeed $$2 + 2 = 4$$.<br>
+One might think of it as an counter-intuitive result
+but without it, we couldn't possibly make sense of this:
 
 $$$
 \sum_{n=0}^\infty n = -\frac{1}{12}

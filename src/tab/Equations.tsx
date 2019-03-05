@@ -28,6 +28,10 @@ type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type FocusEvent  = React.FocusEvent<HTMLInputElement>;
 
 
+// @ts-ignore
+math.type.Unit.isValuelessUnit = () => false; // Disable units
+
+
 
 
 

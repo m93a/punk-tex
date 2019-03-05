@@ -116,11 +116,86 @@ export {baseAddClassName as addClassName};
 
 export namespace Children
 {
-    export const map = React.Children.map;
-    export const forEach = React.Children.forEach;
-    export const count = React.Children.count;
-    export const only = React.Children.only;
-    export const toArray = React.Children.toArray;
+    type ArrayType<T> = T extends any[] ? T : never;
+
+
+    export function* toIterable(children: React.ReactNode)
+    : Iterable<React.ReactChild | React.ReactPortal>
+    {
+        function* flatten(arr: ArrayType<React.ReactNode>)
+        : Iterable<React.ReactChild | React.ReactPortal>
+        {
+            for (const node of arr)
+            {
+                if (Array.isArray(node)) yield* flatten(node);
+                else if (node === null || node === undefined) continue;
+                else if (typeof node === "boolean") continue;
+                else yield node as any; // FIXME: typova chyba bez any
+            }
+        }
+
+        yield* flatten([children]);
+    }
+
+    export function toArray(children: React.ReactNode)
+    : (React.ReactChild | React.ReactPortal)[]
+    {
+        return Array.from(Children.toIterable(children));
+    }
+
+    export function count(children: React.ReactNode): number
+    {
+        let i = 0;
+        for (const _ of Children.toIterable(children)) i++;
+        return i;
+    }
+
+    export function forEach(
+        children: React.ReactNode,
+        fn: (child: React.ReactChild, index: number) => void
+    )
+    {
+        let i = 0;
+        for (const child of Children.toIterable(children))
+        {
+            fn(child, i++);
+        }
+    }
+
+    export function map<T>(
+        children: React.ReactNode,
+        fn: (child: React.ReactChild, index: number) => T
+    ): T[]
+    {
+        let i = 0;
+        const arr: T[] = [];
+
+        for (const child of Children.toIterable(children))
+        {
+            arr.push( fn(child, i++) );
+        }
+
+        return arr;
+    }
+
+    export function onlyChild(children: React.ReactNode): React.ReactChild | React.ReactPortal
+    {
+        if (count(children) !== 1 || children === undefined || children === null)
+        throw TypeError('Children.onlyChild expected to receive a single child.');
+
+        while (Array.isArray(children)) children = children[0];
+
+        if (typeof children === 'boolean') children = String(children);
+
+        return children as any;
+    }
+
+    export function onlyElement(children: React.ReactNode): ValidElement
+    {
+        const el = onlyChild(children);
+        if (!isValidElement(el)) throw new TypeError('Children.onlyElement expected to recieve a valid element.');
+        return el;
+    }
 
     export function addClassName
     (
@@ -140,16 +215,29 @@ export namespace Children
     )
     : boolean
     {
-        let result = false;
-        Children.forEach(children, (ch, i) =>
+        let i = 0;
+        for (const child of Children.toIterable(children))
         {
-            if (!result)
-            {
-                result = fn(ch, i);
-            }
-        });
+            if (fn(child, i++)) return true;
+        }
 
-        return result;
+        return false;
+    }
+
+    export function every
+    (
+        children: React.ReactNode,
+        fn: (child: React.ReactChild, index: number) => boolean
+    )
+    : boolean
+    {
+        let i = 0;
+        for (const child of Children.toIterable(children))
+        {
+            if (!fn(child, i++)) return false;
+        }
+
+        return true;
     }
 }
 
@@ -169,7 +257,7 @@ export namespace Descendants
 
         function loop(descendants: React.ReactNode)
         {
-            React.Children.forEach(descendants, (child) => {
+            Children.forEach(descendants, (child) => {
                 fn(child, index++);
                 if (isValidElement(child))
                 {
@@ -217,7 +305,7 @@ export namespace Descendants
             let descendantsModified = false;
             const modifiedDescendants = Object.create(null);
 
-            React.Children.forEach(descendants, (child, index) =>
+            Children.forEach(descendants, (child, index) =>
             {
                 const newChild = fn(child);
 
@@ -275,10 +363,23 @@ export namespace Descendants
         return i;
     }
 
-    export function only(children: React.ReactNode): React.ReactElement<any>
+    export function onlyChild(children: React.ReactNode): React.ReactChild | React.ReactPortal
     {
-        const child = React.Children.only(children);
-        if (child.props.children) { React.Children.only(undefined); }
+        const child = Children.onlyChild(children);
+
+        if (isValidElement(child) && child.props.children)
+        throw TypeError("Descendants.onlyChild expected to recieve a single child which hasn't got any children of its own");
+
+        return child;
+    }
+
+    export function onlyElement(children: React.ReactNode): ValidElement
+    {
+        const child = Children.onlyElement(children);
+
+        if (child.props.children)
+        throw TypeError("Descendants.onlyElement expected to recieve a single React element child which hasn't got any children of its own");
+
         return child;
     }
 
