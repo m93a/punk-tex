@@ -1,4 +1,4 @@
-import {SerializedEquation} from '../tab/Equations';
+import {SerializedEquation} from '../tabs/Equations';
 
 const sampleEqns = new Map<string, SerializedEquation>();
 

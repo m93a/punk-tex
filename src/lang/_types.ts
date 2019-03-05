@@ -13,7 +13,7 @@ export type ReferenceStrings =
 }
 
 
-import { EquationStringName } from '../tab/Equations';
+import { EquationStringName } from '../tabs/Equations';
 export type EquationStrings =
 {
     [key in EquationStringName]: string

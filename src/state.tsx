@@ -1,9 +1,9 @@
-import Tab from './tab';
+import Tab from './tabs';
 
 import Reference from './structures/Reference';
 import LangStrings from './lang/_types';
 import { loadLang } from './lang';
-import { SerializedEquation } from './tab/Equations';
+import { SerializedEquation } from './tabs/Equations';
 import { Data } from './structures/Data';
 
 import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';

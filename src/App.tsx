@@ -3,7 +3,7 @@ import * as React from 'react';
 import './styles/App.css';
 import state, { AppState } from './state';
 
-import Tab, * as Tabs     from './tab';
+import Tab, * as Tabs     from './tabs';
 import Session from './session';
 import NotificationManager from './NotificationManager';
 import WorkspaceNav from './WorkspaceNav';
