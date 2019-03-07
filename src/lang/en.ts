@@ -25,6 +25,12 @@ const lang: Strings = {
         id: "ID",
         code: "Math code",
         tex: "LaTeX"
+    },
+
+    quantity: {
+        id: "ID",
+        name: "Name of quantity",
+        tex: "Letter (LaTeX)"
     }
 };
 

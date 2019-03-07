@@ -6,6 +6,7 @@ export { default as Preview } from './Preview';
 export { default as References } from './References';
 export { default as EquationManager } from './Equations';
 export { default as DataManager } from './DataManager';
+export { default as Quantities } from './Quantities';
 
 export { default as ReferencePreview } from './ReferencePreview';
 export { default as EquationPreview } from './EquationPreview';

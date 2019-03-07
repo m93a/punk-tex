@@ -25,6 +25,12 @@ const lang: Strings = {
         id: "ID",
         code: "Kód rovnice",
         tex: "LaTeX"
+    },
+
+    quantity: {
+        id: "ID",
+        name: "Jméno veličiny",
+        tex: "Písmeno veličiny (LaTeX)"
     }
 };
 

@@ -17,6 +17,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import TabAddButton from './TabAddButton';
 import Window from './components/Window';
+import * as math from 'mathjs';
 
 state.tabs = [Tabs.Editor, Tabs.Preview];
 
@@ -38,8 +39,13 @@ const defaultLayout: ExtendedLayout[][] = [
   ],
   [
     { i: 'Equations', type: Tabs.EquationManager, x: 0, y: 0, w: 5, h: 4 },
+    { i: 'Quantitites', type: Tabs.Quantities, x: 5, y: 0, w: 5, h: 4 }
   ],
 ];
+
+// !FIXME
+// @ts-ignore
+window.math = math;
 
 class App extends React.Component<{}, App.State>
 {

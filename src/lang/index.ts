@@ -33,7 +33,10 @@ export function ω(
     key: string // TODO keyof Strings[keyof Strings]
 ): string
 {
-    return state.strings[category][key];
+    if (state.strings[category] && state.strings[category][key])
+        return state.strings[category][key];
+    else
+        return `${category}.${key}`;
 }
 
 export class Ω extends React.Component<{

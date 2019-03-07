@@ -19,11 +19,18 @@ export type EquationStrings =
     [key in EquationStringName]: string
 }
 
+import { QuantityStringName } from '../tabs/Quantities';
+export type QuantityStrings =
+{
+    [key in QuantityStringName]: string
+}
+
 
 export interface Strings
 {
     reference: ReferenceStrings;
     equation: EquationStrings;
+    quantity: QuantityStrings;
 }
 
 export default Strings;

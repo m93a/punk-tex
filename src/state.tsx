@@ -4,7 +4,8 @@ import Reference from './structures/Reference';
 import LangStrings from './lang/_types';
 import { loadLang } from './lang';
 import { SerializedEquation } from './tabs/Equations';
-import { Data } from './structures/Data';
+import { Quantity } from './tabs/Quantities';
+import { DataTable } from './tabs/DataManager';
 
 import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';
 import { IndexOutOfRangeError } from './lib/react-helpers';
@@ -12,6 +13,8 @@ import { IndexOutOfRangeError } from './lib/react-helpers';
 import sampleText from './defaults/sampleText';
 import sampleReferences from './defaults/sampleReferences';
 import sampleEquations from './defaults/sampleEquations';
+import sampleQuantities from './defaults/sampleQuantities';
+import sampleTables from './defaults/sampleTables';
 
 export interface Point
 {
@@ -20,7 +23,6 @@ export interface Point
 }
 
 type id = string;
-type tex = string;
 
 export interface AppState
 extends EventTarget<AppState.Event>
@@ -35,11 +37,13 @@ extends EventTarget<AppState.Event>
 
     references: Map<id, Reference.Params>;
     equations:  Map<id, SerializedEquation>;
-    quantities: Map<id, tex>;
-    data: Map<id, Data>;
+    quantities: Map<id, Quantity>;
+    tables:     Map<id, DataTable>;
 
     editingReference?: string;
-    editingEquation?: string;
+    editingEquation?:  string;
+    editingQuantity?:  string;
+    editingTable?:     string;
 
     cursor: Point;
     cursorOnScreen: Point;
@@ -82,8 +86,8 @@ export const state: AppState =
     cursorOnScreen: {row: 0, column: 0},
 
     equations: sampleEquations,
-    quantities: new Map(),
-    data: new Map(),
+    quantities: sampleQuantities,
+    tables: sampleTables,
 
     pointToIndex(point: Point)
     {

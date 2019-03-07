@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as math from 'mathjs';
 import { ui, editable, editable_, rendererArray } from '../lib/ui-decorators';
 import { Iterable, LambdaCache, hashObject } from '../lib/react-helpers';
 import { InternalError } from '../lib/react-helpers/Error';
@@ -20,18 +19,12 @@ from 'react-icons/fa';
 
 import { AppState, state } from '../state';
 import { Ω } from 'src/lang';
-import { Quantity } from './Quantities';
 
-export type EquationStringName = 'id'|'code'|'tex';
+export type QuantityStringName = 'id'|'name'|'tex';
 
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type FocusEvent  = React.FocusEvent<HTMLInputElement>;
-
-
-// @ts-ignore
-math.type.Unit.isValuelessUnit = () => false; // Disable units
-
 
 
 
@@ -43,15 +36,15 @@ math.type.Unit.isValuelessUnit = () => false; // Disable units
 // #region
 
 class ID {}
-class CODE {}
+class NAME {}
 class TEX {}
 
-type rendered = (update: ()=>void) => React.ReactElement<{'data-key': EquationStringName}>;
+type rendered = (update: ()=>void) => React.ReactElement<{'data-key': QuantityStringName}>;
 
 @ui(getRenderers())
-export class SerializedEquation
+export class Quantity
 {
-    public static render(eqn: SerializedEquation): rendered[]
+    public static render(eqn: Quantity): rendered[]
     {
         throw new InternalError(
             "The static 'render' method wasn't correctly overriden. This shouldn't have happened."
@@ -61,41 +54,38 @@ export class SerializedEquation
     // tslint:disable:member-access
 
     @editable('string', ID) id: string = '';
-    @editable('string', CODE) lhs: string = ''; rhs: string = '';
+    @editable_('string', NAME) name?: string;
     @editable_('string', TEX) tex?: string;
 
     // tslint:enable:member-access
 }
 
-function getRenderers(): rendererArray<rendered, SerializedEquation>
+function getRenderers(): rendererArray<rendered, Quantity>
 {
     const cacheOrRetrieve = LambdaCache();
 
     return [
         [
-            ['string', CODE],
+            ['string', NAME],
             (get, set, key, ref) =>
             (updateParent) =>
 
                 <input
                     key={key}
-                    data-key='code'
-                    defaultValue={eqToCode(ref.lhs, ref.rhs)}
+                    data-key={key}
+                    defaultValue={get() || ''}
+                    placeholder={ref.id}
 
-                    onBlur={cacheOrRetrieve(ref, 'code', 'blur', (e: FocusEvent) => e.target.value = `${ref.lhs} = ${ref.rhs}`)}
+                    onBlur={cacheOrRetrieve(ref, 'name', 'blur',
+                    (e: FocusEvent) =>
+                    {
+                        e.target.value = get() || '';
+                    })}
 
-                    onChange={cacheOrRetrieve(ref, 'code', 'click',
+                    onChange={cacheOrRetrieve(ref, 'name', 'click',
                     (e: ChangeEvent) =>
                     {
-                        const code = e.target.value;
-                        const validity = validateCode(code);
-                        e.target.setCustomValidity(validity);
-
-                        if (!validity)
-                        {
-                            [ref.lhs, ref.rhs] = code.split('=').map(s => s.trim());
-                            updateParent();
-                        }
+                        set(e.target.value || undefined);
                     })}
                 />
 
@@ -106,37 +96,22 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
             (get, set, key, ref) =>
             (updateParent) =>
 
-                // ! @RisaI
-                // až to budeš portovat do MaterialUI, přidej prosím na tenhle
-                // input takový to clear button, jako je u <input type=search />
-
                 <input
                     key={key}
                     data-key={key}
-                    placeholder={eqToTex(ref.lhs, ref.rhs)}
-                    defaultValue={get()}
-
-                    onFocus={cacheOrRetrieve(ref, key, 'focus',
-                    (e: FocusEvent) =>
-                    {
-                        if(get()) return;
-                        e.target.value = eqToTex(ref.lhs, ref.rhs);
-                    })}
+                    defaultValue={get() || ''}
+                    placeholder={ref.id[0]}
 
                     onBlur={cacheOrRetrieve(ref, key, 'blur',
                     (e: FocusEvent) =>
                     {
-                        if (e.target.value === eqToTex(ref.lhs, ref.rhs))
-                        {
-                            set(undefined);
-                            e.target.value = '';
-                        }
+                        e.target.value = ref.tex || '';
                     })}
 
                     onChange={cacheOrRetrieve(ref, key, 'change',
                     (e: ChangeEvent) =>
                     {
-                        set(e.target.value);
+                        set(e.target.value || undefined);
                         updateParent();
                     })}
                 />
@@ -160,9 +135,9 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                     {
                         const id1 = get();
                         const id2 = e.target.value;
-                        const eqns = state.equations;
+                        const qnts = state.quantities;
 
-                        if (id2 !== id1 && eqns.has(id2))
+                        if (id2 !== id1 && qnts.has(id2))
                         {
                             e.target.setCustomValidity('Cannot change id – this identifier is already in use.');
                             return;
@@ -173,9 +148,9 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                         }
 
                         set(id2);
-                        eqns.set(id2, ref);
-                        eqns.delete(id1);
-                        state.editingEquation = id2;
+                        qnts.set(id2, ref);
+                        qnts.delete(id1);
+                        state.editingQuantity = id2;
                         updateParent();
                     })
                 }
@@ -189,75 +164,6 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
             />
         ]
     ];
-}
-
-function validateCode(code: string)
-{
-
-    if (!code.includes('='))
-    {
-        return 'The equation doesn\'t contain the `=` sign.';
-    }
-    else
-    {
-        let failed: boolean = false;
-
-        try
-        {
-            const [lhs, rhs] = code.split('=');
-            math.parse(rhs);
-            failed = !math.parse(lhs).isSymbolNode;
-        }
-        catch(err){
-            return (err as Error).message;
-        }
-
-        if(failed)
-        {
-            return 'The LHS has to be a variable.';
-        }
-        else
-        {
-            return '';
-        }
-    }
-}
-
-function eqToCode(lhs: string, rhs: string)
-{
-    return `${lhs.trim()} = ${rhs.trim()}`;
-}
-
-function eqToTex(lhs: string, rhs: string)
-{
-    return `${codeToTex(lhs.trim()).trim()} = ${codeToTex(rhs.trim()).trim()}`;
-}
-
-const codeToTex = (function()
-{
-    let lastCode: string = '';
-    let lastTex: string = '';
-
-    return function(code: string)
-    {
-        if (code === lastCode) return lastTex;
-
-        lastTex = math.parse(code).toTex({ handler: toTexHandler });
-        lastCode = code; // if parse() doesn't throw
-
-        return lastTex;
-    }
-})();
-
-function toTexHandler(c: any)
-{
-    if (typeof c.name === 'string' && state.quantities.has(c.name))
-    {
-        const qty = state.quantities.get(c.name) as Quantity;
-        return qty.tex;
-    }
-
-    return;
 }
 
 // #endregion
@@ -283,7 +189,7 @@ const buttonParams =
 
 interface ButtonProps
 {
-    tab: EquationManager;
+    tab: QuantityManager;
     id: string;
 }
 
@@ -349,7 +255,7 @@ class EditEqButton extends React.Component<ButtonProps>
 
     public onClick = () =>
     {
-        state.editingEquation = this.props.id;
+        state.editingQuantity = this.props.id;
         this.props.tab.update();
     }
 }
@@ -366,9 +272,9 @@ extends React.Component<ButtonProps>
     {
         const id = this.props.id;
 
-        if (confirm("Opravdu chceš odstranit rovnici ["+id+"]?"))
+        if (confirm("Opravdu chceš odstranit veličinu ["+id+"]?"))
         {
-            state.equations.delete(id);
+            state.quantities.delete(id);
             this.props.tab.update();
         }
     }
@@ -388,19 +294,14 @@ extends React.Component<ButtonProps>
         let id: string;
         do
         {
-            id = 'equation-'+((Math.random()*1000)|0);
+            id = 'quantity-'+((Math.random()*1000)|0);
         }
-        while(state.equations.has(id));
+        while(state.quantities.has(id));
 
-        const ref: SerializedEquation =
-        {
-            id,
-            lhs: 'a',
-            rhs: 'b'
-        };
+        const ref: Quantity = { id };
 
-        state.equations.set(id, ref);
-        state.editingEquation = id;
+        state.quantities.set(id, ref);
+        state.editingQuantity = id;
 
         this.props.tab.update();
     }
@@ -417,7 +318,7 @@ extends React.Component<ButtonProps>
 
     public onClick = () =>
     {
-        state.editingEquation = undefined;
+        state.editingQuantity = undefined;
         this.props.tab.update();
     }
 }
@@ -433,13 +334,12 @@ extends React.Component<ButtonProps>
 
 // #region
 
-class EquationManager extends Tab<{preview: boolean}>
+class QuantityManager extends Tab<{preview: boolean}>
 {
-    public static get title() { return 'Equations' };
+    public static get title() { return 'Quantities' };
 
     public update = () =>
     {
-        console.log(state.editingEquation);
         this.forceUpdate();
     }
 
@@ -450,19 +350,19 @@ class EquationManager extends Tab<{preview: boolean}>
             { !this.props.preview &&
             <div className="ref-new">
                 <NewEqButton tab={this} id='' />
-                Nová rovnice
+                Nová veličina
             </div>
             }
 
             {
-                Array.from( Iterable.map(state.equations.entries(),
-                    ([id, eq]) =>
+                Array.from( Iterable.map(state.quantities.entries(),
+                    ([id, qty]) =>
                         this.props.preview
-                            ? this.renderPreview(id, eq)
+                            ? this.renderPreview(id, qty)
 
-                        : state.editingEquation === eq.id
-                            ? this.renderEditor(id, eq)
-                            : this.renderPreview(id, eq)
+                        : state.editingQuantity === qty.id
+                            ? this.renderEditor(id, qty)
+                            : this.renderPreview(id, qty)
                     )
                 )
             }
@@ -470,7 +370,7 @@ class EquationManager extends Tab<{preview: boolean}>
         </div>;
     }
 
-    private renderPreview(id: string, eq: SerializedEquation)
+    private renderPreview(id: string, eq: Quantity)
     {
         const props = { tab: this, id };
 
@@ -489,9 +389,7 @@ class EquationManager extends Tab<{preview: boolean}>
 
             <span onClick={this.update}>{`[${id}] `}</span>
             <span dangerouslySetInnerHTML={{
-                __html: parseTex(
-                    eq.tex || (eqToTex(eq.lhs, eq.rhs))
-                )
+                __html: parseTex( eq.tex || eq.id[0] )
             }} />
         </div>;
 
@@ -500,23 +398,23 @@ class EquationManager extends Tab<{preview: boolean}>
 
 
 
-    private renderEditor(id: string, eq: SerializedEquation)
+    private renderEditor(id: string, eq: Quantity)
     {
         return (
         <div key={hashObject(eq)} className="ref-edit">
 
             <CloseEditButton tab={this} id='' />
-            <span className="ref-edit-title">Editace rovnice [{id}]</span>
+            <span className="ref-edit-title">Editace veličiny [{id}]</span>
 
             <table><tbody>
             {
-                SerializedEquation
-                .render(state.equations.get(id)!) // render equation editor
+                Quantity
+                .render(state.quantities.get(id)!) // render quantity editor
                 .map(x => x(this.update)) // pass the update function to the UI
                 .map(el =>
                     <tr key={el.props['data-key']}>
 
-                        <td><Ω c="equation" k={el.props['data-key']} /></td>
+                        <td><Ω c="quantity" k={el.props['data-key']} /></td>
 
                         <td>{el}</td>
 
@@ -529,6 +427,6 @@ class EquationManager extends Tab<{preview: boolean}>
     }
 }
 
-export default EquationManager;
+export default QuantityManager;
 
 // #endregion
