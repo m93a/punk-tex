@@ -1,15 +1,21 @@
 import * as React from 'react';
 import Tab from './Tab';
-import { Data, Table } from '../structures/Data';
 import { Quantity } from './Quantities';
 import { state } from '../state';
 
 import * as parseDecimal from 'parse-decimal-number';
-import { Paper, Grid, List, ListItem, ListItemText } from '@material-ui/core';
-import { LambdaCache } from 'src/lib/react-helpers';
+import { LambdaCache, hashObject } from 'src/lib/react-helpers';
+
+import
+{
+    Paper, Grid,
+    List, ListItem, ListItemText,
+    Table, TableBody, TableHead, TableRow, TableCell
+}
+from '@material-ui/core';
 
 
-export interface DataTable
+export interface Data
 {
     id: string;
     name: string;
@@ -18,7 +24,7 @@ export interface DataTable
 
 export interface DataColumn
 {
-    quantity: Quantity;
+    quantity: Quantity | null;
     values: (number|string)[];
 }
 
@@ -29,7 +35,6 @@ class DataManager extends Tab
     public static get title() { return 'Data' };
 
     private cacheOrRetrieve = LambdaCache();
-    private data: Data | undefined; // !FIXME remove
 
     public render()
     {
@@ -37,16 +42,24 @@ class DataManager extends Tab
             direction="row"
             spacing={8}
             alignItems="stretch"
-            style={{height:"100%"}}
+            style={{height:"100%", width:"100%"}}
+            onPaste={this.onPaste}
         >
             <Grid item xs={2}>
-                <Paper square style={{height:"100%"}}>
+                <Paper square style={{height:"100%", overflow:"hidden"}}>
                     <List>
                         {this.renderMenu()}
                     </List>
                 </Paper>
             </Grid>
-            <Grid item>
+            <Grid item
+                xs={10}
+                style={{
+                    padding:"20px",
+                    height: "100%",
+                    overflow: "scroll"
+                }}
+            >
                 {this.renderTable()}
             </Grid>
         </Grid>;
@@ -84,18 +97,19 @@ class DataManager extends Tab
         {
             const table = state.tables.get(state.editingTable!)!;
 
-            return <span>{table.name}</span>
+            return DataTable.render(table);
         }
         else return (
-            <div onPaste={this.onPaste}>
-                {this.data ? <Table data={this.data} /> : "Vložte tabulku z Excelu pomocí Ctrl+V"}
+            <div>
+                Vložte tabulku z Excelu pomocí Ctrl+V
             </div>
         );
     }
 
     public onPaste = (e: React.ClipboardEvent) =>
     {
-        this.data = dataFromHtml(e.clipboardData.getData('text/html'));
+        state.tables.set('pasted', dataFromHtml(e.clipboardData.getData('text/html')));
+        state.editingEquation = 'pasted';
         this.forceUpdate();
     }
 }
@@ -106,7 +120,13 @@ export default DataManager;
 
 function dataFromHtml(src: string): Data
 {
-    const arr: number[][] = [];
+    const data: Data = {
+        id: 'pasted',
+        name: 'Vložená tabulka',
+        columns: []
+    };
+
+    const arr = data.columns;
 
     const doc = (new DOMParser()).parseFromString(src, 'text/html');
     const table: HTMLElement = doc.getElementsByTagName('table')[0];
@@ -118,13 +138,82 @@ function dataFromHtml(src: string): Data
 
         for (const td of tr.getElementsByTagName('td'))
         {
-            arr[j] = arr[j] || [];
-            arr[j][i] = parseDecimal(td.innerText,' ,');
+            let value: number | string = parseDecimal(td.innerText,' ,');
+            if (isNaN(value)) value = td.innerText;
+
+            arr[j] = arr[j] || {quantity: null, values: []};
+            arr[j].values[i] = value;
             j++;
         }
 
         i++;
     }
 
-    return new Data(arr);
+    return data;
+}
+
+
+export class DataTable
+{
+    public static render(data: Data)
+    {
+        return <Table >
+            { DataTable.renderHead(data) }
+            { DataTable.renderBody(data) }
+        </Table>
+    }
+
+    public static renderHead(data: Data)
+    {
+        return <TableHead>
+            { data.columns.map(DataTable.renderHeading) }
+        </TableHead>
+    }
+
+    public static renderHeading(col: DataColumn)
+    {
+        return <TableCell component="th" key={hashObject(col)}>
+            {col.quantity ? col.quantity.name : "[veličina]"}
+        </TableCell>;
+    }
+
+    public static renderBody(data: Data)
+    {
+        const columns = data.columns;
+        const rowArr: React.ReactChild[] = [];
+
+        for (let row = 0 ;; row++)
+        {
+            const colArr = columns.map(col => DataTable.renderCell(col, row));
+
+            rowArr.push(<TableRow>{colArr}</TableRow>);
+
+            if (columns.every(col => col.values.length <= row)) break;
+        }
+
+        return <TableBody>
+            { rowArr }
+        </TableBody>
+    }
+
+    public static renderCell(col: DataColumn, rowIndex: number)
+    {
+        return (
+            <TableCell
+                contentEditable
+                key={`${hashObject(col)}[${rowIndex}]`}
+            >
+                {col.values[rowIndex]}
+
+            </TableCell>
+        );
+    }
+}
+
+export namespace Table
+{
+    export interface Props
+    {
+        data: Data;
+    }
 }

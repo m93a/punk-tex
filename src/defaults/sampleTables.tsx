@@ -1,7 +1,7 @@
-import {DataTable} from '../tabs/DataManager';
+import {Data} from '../tabs/DataManager';
 import sampleQuantities from './sampleQuantities';
 
-const sampleTables = new Map<string, DataTable>();
+const sampleTables = new Map<string, Data>();
 
 sampleTables.set(
     'rcMeasurements',

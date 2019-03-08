@@ -65,6 +65,16 @@ export class SerializedEquation
     @editable_('string', TEX) tex?: string;
 
     // tslint:enable:member-access
+
+    public static toTex(eq: SerializedEquation)
+    {
+        return eq.tex || eqToTex(eq.lhs, eq.rhs);
+    }
+
+    public static toHtml(eq: SerializedEquation)
+    {
+        return parseTex(SerializedEquation.toTex(eq))
+    }
 }
 
 function getRenderers(): rendererArray<rendered, SerializedEquation>
@@ -489,9 +499,7 @@ class EquationManager extends Tab<{preview: boolean}>
 
             <span onClick={this.update}>{`[${id}] `}</span>
             <span dangerouslySetInnerHTML={{
-                __html: parseTex(
-                    eq.tex || (eqToTex(eq.lhs, eq.rhs))
-                )
+                __html: SerializedEquation.toHtml(eq)
             }} />
         </div>;
 

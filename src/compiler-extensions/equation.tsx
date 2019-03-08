@@ -1,10 +1,9 @@
 import * as React from 'react';
-import * as math from 'mathjs';
-import { toMathMLString } from "texzilla";
 
 import { MarkdownIt } from 'markdown-it';
 import { AppState } from '../state';
 import { renderAsInlineToken } from '../lib/markdown-it-react-interop';
+import { SerializedEquation } from '../tabs/Equations';
 
 import makeRule from './lib.inline-command';
 
@@ -41,15 +40,9 @@ export default function insertPlugin(md: MarkdownIt, appState: AppState)
 
         const eq = appState.equations.get(id)!;
 
-        const tex = eq.tex ||
-                `${math.parse(eq.lhs).toTex()} = ${math.parse(eq.rhs).toTex()}`;
-
-
-        console.log(toMathMLString(tex));
-
         return (
             <span className='eqn-body' dangerouslySetInnerHTML={{
-                __html: toMathMLString(tex)
+                __html: SerializedEquation.toHtml(eq)
             }} />
         );
     }

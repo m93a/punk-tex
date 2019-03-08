@@ -5,7 +5,7 @@ import LangStrings from './lang/_types';
 import { loadLang } from './lang';
 import { SerializedEquation } from './tabs/Equations';
 import { Quantity } from './tabs/Quantities';
-import { DataTable } from './tabs/DataManager';
+import { Data } from './tabs/DataManager';
 
 import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';
 import { IndexOutOfRangeError } from './lib/react-helpers';
@@ -38,7 +38,7 @@ extends EventTarget<AppState.Event>
     references: Map<id, Reference.Params>;
     equations:  Map<id, SerializedEquation>;
     quantities: Map<id, Quantity>;
-    tables:     Map<id, DataTable>;
+    tables:     Map<id, Data>;
 
     editingReference?: string;
     editingEquation?:  string;
