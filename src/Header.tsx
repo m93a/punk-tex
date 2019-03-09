@@ -78,11 +78,21 @@ extends React.Component<Header.Props, Header.State> {
         this.setState({ modal: 'login' });
     }
 
+    private _fileElement: HTMLInputElement | undefined;
+    private setFileRef = (el: HTMLInputElement) => this._fileElement = el;
+    public openFileDialog = () => this._fileElement!.click();
+    public onLoadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files!.item(0)!;
+        e.target.value = null as any;
+        setProject(await FS.loadProject(file));
+    }
+
     private menus: Menus = {
         add: {
             icon: Add,
             items: [
-                { title: 'New Project', action: () => setProject(new Project()) }
+                { title: 'New Project', action: () => setProject(new Project()) },
+                { title: 'Load Project', action: this.openFileDialog },
             ]
         },
         save: {
@@ -195,6 +205,12 @@ extends React.Component<Header.Props, Header.State> {
                 <Header.RegisterDialog
                     open={this.state.modal === 'register'}
                     onClose={this.closeModal}
+                />
+                <input
+                    type='file'
+                    ref={this.setFileRef}
+                    style={{ display: 'none' }}
+                    onChange={this.onLoadFile}
                 />
             </AppBar>
         );

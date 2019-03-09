@@ -18,6 +18,11 @@ import 'react-resizable/css/styles.css';
 import TabAddButton from './TabAddButton';
 import Window from './components/Window';
 import * as math from 'mathjs';
+import FS from './filesystem';
+
+(window as any).test = async () => {
+  return await FS.stringifyMap(state.project.references);
+};
 
 export interface ExtendedLayout
 extends Grid.Layout {

@@ -1,8 +1,8 @@
-import Tab from "./tabs";
 import Reference from "./structures/Reference";
 import { SerializedEquation } from "./tabs/Equations";
 import { Quantity } from "./tabs/Quantities";
 import { Data } from "./tabs/DataManager";
+// import Tab from "./tabs";
 
 import sampleReferences from "./defaults/sampleReferences";
 import sampleEquations from "./defaults/sampleEquations";
@@ -14,7 +14,7 @@ type id = string;
 
 class Project
 {
-    public tabs: (typeof Tab)[] = [];
+    // public tabs: (typeof Tab)[] = [];
     public content: string = '';
 
     public references: Map<id, Reference.Params>;
