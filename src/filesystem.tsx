@@ -17,8 +17,6 @@ namespace FileSystem
         zip.file('quantities', stringifyMap(project.quantities));
         zip.file('tables',     stringifyMap(project.tables));
 
-        console.log(project.references);
-
         return await zip.generateAsync({ type: 'blob' });
     }
 
