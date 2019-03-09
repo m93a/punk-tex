@@ -7,6 +7,7 @@ import { Theme } from '@material-ui/core/styles';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Add from '@material-ui/icons/Add';
+import Save from '@material-ui/icons/Save';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -24,7 +25,9 @@ import TextField from '@material-ui/core/TextField';
 
 import { Logo } from './components';
 import Session from './session';
-import state, { AppState } from './state';
+import state, { AppState, setProject } from './state';
+import Project from './project';
+import FS from './filesystem';
 
 interface Menu {
     icon: typeof SvgIcon;
@@ -79,7 +82,13 @@ extends React.Component<Header.Props, Header.State> {
         add: {
             icon: Add,
             items: [
-                { title: 'New Project' }
+                { title: 'New Project', action: () => setProject(new Project()) }
+            ]
+        },
+        save: {
+            icon: Save,
+            items: [
+                { title: 'Save', action: async () => FS.saveAs(await FS.archive(state.project), "project.zip") }
             ]
         },
         user: {

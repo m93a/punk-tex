@@ -1,28 +1,16 @@
-import Tab from './tabs';
-
-import Reference from './structures/Reference';
 import LangStrings from './lang/_types';
 import { loadLang } from './lang';
-import { SerializedEquation } from './tabs/Equations';
-import { Quantity } from './tabs/Quantities';
-import { Data } from './tabs/DataManager';
 
 import { EventTarget, addEventListener, removeEventListener, dispatchEvent } from './lib/react-helpers/Event';
 import { IndexOutOfRangeError } from './lib/react-helpers';
 
-import sampleText from './defaults/sampleText';
-import sampleReferences from './defaults/sampleReferences';
-import sampleEquations from './defaults/sampleEquations';
-import sampleQuantities from './defaults/sampleQuantities';
-import sampleTables from './defaults/sampleTables';
+import Project from './project';
 
 export interface Point
 {
     row: number;
     column: number;
 }
-
-type id = string;
 
 export interface AppState
 extends EventTarget<AppState.Event>
@@ -32,13 +20,7 @@ extends EventTarget<AppState.Event>
 
     workspace: number;
 
-    tabs: (typeof Tab)[];
-    content: string;
-
-    references: Map<id, Reference.Params>;
-    equations:  Map<id, SerializedEquation>;
-    quantities: Map<id, Quantity>;
-    tables:     Map<id, Data>;
+    project: Project;
 
     editingReference?: string;
     editingEquation?:  string;
@@ -64,7 +46,13 @@ export namespace AppState
         LanguageChange = 'languagechange',
         CompilationError = 'compilationerror',
         LoginStateChange = 'loginstatechange',
+        ProjectChange = 'projectchange',
     }
+}
+
+export function setProject(proj: Project) {
+    state.project = proj;
+    state.dispatchEvent(AppState.Event.ProjectChange);
 }
 
 export const state: AppState =
@@ -78,20 +66,14 @@ export const state: AppState =
 
     workspace: 0,
 
-    tabs: [],
-    content: sampleText,
-    references: sampleReferences,
+    project: new Project(true),
 
     cursor: {row: 0, column: 0},
     cursorOnScreen: {row: 0, column: 0},
 
-    equations: sampleEquations,
-    quantities: sampleQuantities,
-    tables: sampleTables,
-
     pointToIndex(point: Point)
     {
-        const str = this.content;
+        const str = this.project.content;
         let row = 0;
         let pos = 0;
         let lineStart = 0;
@@ -120,7 +102,7 @@ export const state: AppState =
 
     indexToPoint(index: number)
     {
-        const str = this.content;
+        const str = this.project.content;
         let row = 0;
         let pos = 0;
         let lineStart = 0;

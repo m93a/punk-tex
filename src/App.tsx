@@ -19,8 +19,6 @@ import TabAddButton from './TabAddButton';
 import Window from './components/Window';
 import * as math from 'mathjs';
 
-state.tabs = [Tabs.Editor, Tabs.Preview];
-
 export interface ExtendedLayout
 extends Grid.Layout {
   type: typeof Tab;
@@ -118,12 +116,14 @@ class App extends React.Component<{}, App.State>
     const elem = document.getElementById('audio-start') as HTMLAudioElement;
     elem.play();
     state.addEventListener(AppState.Event.TabChange, this.update);
+    state.addEventListener(AppState.Event.ProjectChange, this.update);
     this.checkLogin();
   }
 
   public componentWillUnmount()
   {
     state.removeEventListener(AppState.Event.TabChange, this.update);
+    state.removeEventListener(AppState.Event.ProjectChange, this.update);
   }
 
   private checkLogin = async () => {
