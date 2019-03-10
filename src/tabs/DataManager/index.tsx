@@ -1,21 +1,19 @@
 import * as React from 'react';
-import Tab from './Tab';
-import { Quantity } from './Quantities';
-import { state } from '../state';
+import Tab from '../Tab';
+import { Quantity } from '../Quantities';
+import { state } from 'src/state';
 
-import * as parseDecimal from 'parse-decimal-number';
-import { LambdaCache, hashObject } from 'src/lib/react-helpers';
+import { LambdaCache } from 'src/lib/react-helpers';
 
 import
 {
-    Paper, Grid, Button, Typography,
+    Paper, Grid,
     List, ListItem, ListItemText,
-    Table, TableBody, TableHead, TableRow, TableCell,
-    Dialog, DialogTitle, DialogContent, DialogActions
 }
 from '@material-ui/core';
 
-import { FaCog } from "react-icons/fa";
+import { TableMaker } from './TableMaker';
+import dataFromHtml from './dataFromHtml';
 
 
 export interface Data
@@ -129,181 +127,3 @@ class DataManager extends Tab
 }
 
 export default DataManager;
-
-
-
-function dataFromHtml(src: string): Data
-{
-    const data: Data = {
-        id: 'pasted',
-        name: 'Vložená tabulka',
-        columns: []
-    };
-
-    const arr = data.columns;
-
-    const doc = (new DOMParser()).parseFromString(src, 'text/html');
-    const table: HTMLElement = doc.getElementsByTagName('table')[0];
-
-    let i = 0;
-    for (const tr of table.getElementsByTagName('tr'))
-    {
-        let j = 0;
-
-        for (const td of tr.getElementsByTagName('td'))
-        {
-            let value: number | string = parseDecimal(td.innerText,' ,');
-            if (isNaN(value)) value = td.innerText;
-
-            arr[j] = arr[j] || {quantity: null, values: []};
-            arr[j].values[i] = value;
-            j++;
-        }
-
-        i++;
-    }
-
-    return data;
-}
-
-
-export class TableMaker
-{
-    private cacheOrRetrieve = LambdaCache();
-    private ref: DataManager;
-
-    constructor(ref: DataManager)
-    {
-        this.ref = ref;
-    }
-
-    public render(data: Data)
-    {
-        return <Table>
-            { this.renderHead(data) }
-            { this.renderBody(data) }
-            { this.renderDialog() }
-        </Table>
-    }
-
-    public renderHead(data: Data)
-    {
-        return <TableHead>
-            { data.columns.map( col => this.renderHeading(col)) }
-        </TableHead>
-    }
-
-    public renderHeading(col: DataColumn)
-    {
-        return <TableCell component="th" key={hashObject(col)}>
-            {col.quantity ? col.quantity.name : "[veličina]"}{" "}
-            <FaCog className="icon button" onClick={this.cacheOrRetrieve(col, this.ref.modals, () => { this.ref.modals.openColumnSettings = col; this.ref.forceUpdate() })} /> {/* Yes I can make a line this long. */}
-        </TableCell>;
-    }
-
-    public renderBody(data: Data)
-    {
-        const columns = data.columns;
-        const rowArr: React.ReactChild[] = [];
-
-        for (let row = 0 ;; row++)
-        {
-            const colArr = columns.map(col => this.renderCell(col, row));
-
-            rowArr.push(<TableRow>{colArr}</TableRow>);
-
-            if (columns.every(col => col.values.length <= row)) break;
-        }
-
-        return <TableBody>
-            { rowArr }
-        </TableBody>
-    }
-
-    public renderCell(col: DataColumn, rowIndex: number)
-    {
-        return (
-            <TableCell
-                contentEditable
-                key={`${hashObject(col)}[${rowIndex}]`}
-            >
-                {col.values[rowIndex]}
-
-            </TableCell>
-        );
-    }
-
-    public renderDialog()
-    {
-        const modals = this.ref.modals;
-
-        if (!modals.openColumnSettings) return;
-
-        return (
-            <ColumnSettings
-                col={modals.openColumnSettings}
-                onClose={this.cacheOrRetrieve(
-                    modals, () => {
-                        modals.openColumnSettings = undefined;
-                        this.ref.forceUpdate();
-                    }
-                )}
-            />
-        );
-    };
-
-
-}
-
-export namespace Table
-{
-    export interface Props
-    {
-        data: Data;
-    }
-}
-
-
-namespace ColumnSettings
-{
-    export interface Props
-    {
-        col: DataColumn;
-        onClose: () => void;
-    }
-}
-class ColumnSettings
-extends React.Component<ColumnSettings.Props>
-{
-    public render()
-    {
-        return (
-          <Dialog open onClose={this.props.onClose}>
-              <DialogTitle>
-                Nastavení sloupce {this.props.col.quantity!.name || '[veličina]'}
-              </DialogTitle>
-              <DialogContent>
-                <Typography gutterBottom>
-                    Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac
-                    facilisis in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum
-                    at eros.
-                </Typography>
-                <Typography gutterBottom>
-                    Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis
-                    lacus vel augue laoreet rutrum faucibus dolor auctor.
-                </Typography>
-                <Typography gutterBottom>
-                    Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel
-                    scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus
-                    auctor fringilla.
-                </Typography>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={this.props.onClose} color="primary">
-                    OK
-                </Button>
-              </DialogActions>
-          </Dialog>
-        );
-    }
-}
