@@ -8,11 +8,14 @@ import { LambdaCache, hashObject } from 'src/lib/react-helpers';
 
 import
 {
-    Paper, Grid,
+    Paper, Grid, Button, Typography,
     List, ListItem, ListItemText,
-    Table, TableBody, TableHead, TableRow, TableCell
+    Table, TableBody, TableHead, TableRow, TableCell,
+    Dialog, DialogTitle, DialogContent, DialogActions
 }
 from '@material-ui/core';
+
+import { FaCog } from "react-icons/fa";
 
 
 export interface Data
@@ -27,6 +30,10 @@ export interface DataColumn
     quantity: Quantity | null;
     values: (number|string)[];
 }
+interface ModalsState
+{
+    openColumnSettings: DataColumn | undefined;
+}
 
 
 
@@ -35,6 +42,13 @@ class DataManager extends Tab
     public static get title() { return 'Data' };
 
     private cacheOrRetrieve = LambdaCache();
+
+    private tableMaker = new TableMaker(this);
+
+    public modals: ModalsState = {
+        openColumnSettings: undefined
+    }
+
 
     public render()
     {
@@ -97,7 +111,7 @@ class DataManager extends Tab
         {
             const table = state.tables.get(state.editingTable!)!;
 
-            return DataTable.render(table);
+            return this.tableMaker.render(table);
         }
         else return (
             <div>
@@ -153,38 +167,48 @@ function dataFromHtml(src: string): Data
 }
 
 
-export class DataTable
+export class TableMaker
 {
-    public static render(data: Data)
+    private cacheOrRetrieve = LambdaCache();
+    private ref: DataManager;
+
+    constructor(ref: DataManager)
     {
-        return <Table >
-            { DataTable.renderHead(data) }
-            { DataTable.renderBody(data) }
+        this.ref = ref;
+    }
+
+    public render(data: Data)
+    {
+        return <Table>
+            { this.renderHead(data) }
+            { this.renderBody(data) }
+            { this.renderDialog() }
         </Table>
     }
 
-    public static renderHead(data: Data)
+    public renderHead(data: Data)
     {
         return <TableHead>
-            { data.columns.map(DataTable.renderHeading) }
+            { data.columns.map( col => this.renderHeading(col)) }
         </TableHead>
     }
 
-    public static renderHeading(col: DataColumn)
+    public renderHeading(col: DataColumn)
     {
         return <TableCell component="th" key={hashObject(col)}>
-            {col.quantity ? col.quantity.name : "[veličina]"}
+            {col.quantity ? col.quantity.name : "[veličina]"}{" "}
+            <FaCog className="icon button" onClick={this.cacheOrRetrieve(col, this.ref.modals, () => { this.ref.modals.openColumnSettings = col; this.ref.forceUpdate() })} /> {/* Yes I can make a line this long. */}
         </TableCell>;
     }
 
-    public static renderBody(data: Data)
+    public renderBody(data: Data)
     {
         const columns = data.columns;
         const rowArr: React.ReactChild[] = [];
 
         for (let row = 0 ;; row++)
         {
-            const colArr = columns.map(col => DataTable.renderCell(col, row));
+            const colArr = columns.map(col => this.renderCell(col, row));
 
             rowArr.push(<TableRow>{colArr}</TableRow>);
 
@@ -196,7 +220,7 @@ export class DataTable
         </TableBody>
     }
 
-    public static renderCell(col: DataColumn, rowIndex: number)
+    public renderCell(col: DataColumn, rowIndex: number)
     {
         return (
             <TableCell
@@ -208,6 +232,27 @@ export class DataTable
             </TableCell>
         );
     }
+
+    public renderDialog()
+    {
+        const modals = this.ref.modals;
+
+        if (!modals.openColumnSettings) return;
+
+        return (
+            <ColumnSettings
+                col={modals.openColumnSettings}
+                onClose={this.cacheOrRetrieve(
+                    modals, () => {
+                        modals.openColumnSettings = undefined;
+                        this.ref.forceUpdate();
+                    }
+                )}
+            />
+        );
+    };
+
+
 }
 
 export namespace Table
@@ -215,5 +260,50 @@ export namespace Table
     export interface Props
     {
         data: Data;
+    }
+}
+
+
+namespace ColumnSettings
+{
+    export interface Props
+    {
+        col: DataColumn;
+        onClose: () => void;
+    }
+}
+class ColumnSettings
+extends React.Component<ColumnSettings.Props>
+{
+    public render()
+    {
+        return (
+          <Dialog open onClose={this.props.onClose}>
+              <DialogTitle>
+                Nastavení sloupce {this.props.col.quantity!.name || '[veličina]'}
+              </DialogTitle>
+              <DialogContent>
+                <Typography gutterBottom>
+                    Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac
+                    facilisis in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum
+                    at eros.
+                </Typography>
+                <Typography gutterBottom>
+                    Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis
+                    lacus vel augue laoreet rutrum faucibus dolor auctor.
+                </Typography>
+                <Typography gutterBottom>
+                    Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel
+                    scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus
+                    auctor fringilla.
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.props.onClose} color="primary">
+                    OK
+                </Button>
+              </DialogActions>
+          </Dialog>
+        );
     }
 }
