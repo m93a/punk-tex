@@ -18,7 +18,7 @@ export default function insertPlugin(md: MarkdownIt, appState: AppState)
 
     function renderRef(id: string)
     {
-        if (!appState.references.has(id))
+        if (!appState.project.references.has(id))
         {
             return <span className="ref-index ref-intext error">[Neznámé id citace: {id}]</span>
         }
@@ -35,7 +35,7 @@ export default function insertPlugin(md: MarkdownIt, appState: AppState)
 
     function renderUsedRefs()
     {
-        const allRefs = appState.references;
+        const allRefs = appState.project.references;
         const renderedRefs: React.ReactNode[] = [];
         for (let i = 0; i < usedRefs.length; i++)
         {

@@ -135,7 +135,7 @@ function getRenderers(): rendererArray<rendered, Quantity>
                     {
                         const id1 = get();
                         const id2 = e.target.value;
-                        const qnts = state.quantities;
+                        const qnts = state.project.quantities;
 
                         if (id2 !== id1 && qnts.has(id2))
                         {
@@ -208,10 +208,10 @@ class PasteEquationButton extends React.Component<ButtonProps>
     {
         const index = state.pointToIndex(state.cursor);
 
-        state.content =
-            state.content.substring(0, index) +
+        state.project.content =
+            state.project.content.substring(0, index) +
             "&Eq(" + this.props.id + ")" +
-            state.content.substring(index);
+            state.project.content.substring(index);
 
         state.dispatchEvent(
             AppState.Event.ContentChange,
@@ -234,10 +234,10 @@ class PasteIndexButton extends React.Component<ButtonProps>
     {
         const index = state.pointToIndex(state.cursor);
 
-        state.content =
-            state.content.substring(0, index) +
+        state.project.content =
+            state.project.content.substring(0, index) +
             "&eqref(" + this.props.id + ")" +
-            state.content.substring(index);
+            state.project.content.substring(index);
 
         state.dispatchEvent(
             AppState.Event.ContentChange,
@@ -274,7 +274,7 @@ extends React.Component<ButtonProps>
 
         if (confirm("Opravdu chceš odstranit veličinu ["+id+"]?"))
         {
-            state.quantities.delete(id);
+            state.project.quantities.delete(id);
             this.props.tab.update();
         }
     }
@@ -296,11 +296,11 @@ extends React.Component<ButtonProps>
         {
             id = 'quantity-'+((Math.random()*1000)|0);
         }
-        while(state.quantities.has(id));
+        while(state.project.quantities.has(id));
 
         const ref: Quantity = { id };
 
-        state.quantities.set(id, ref);
+        state.project.quantities.set(id, ref);
         state.editingQuantity = id;
 
         this.props.tab.update();
@@ -355,7 +355,7 @@ class QuantityManager extends Tab<{preview: boolean}>
             }
 
             {
-                Array.from( Iterable.map(state.quantities.entries(),
+                Array.from( Iterable.map(state.project.quantities.entries(),
                     ([id, qty]) =>
                         this.props.preview
                             ? this.renderPreview(id, qty)
@@ -409,7 +409,7 @@ class QuantityManager extends Tab<{preview: boolean}>
             <table><tbody>
             {
                 Quantity
-                .render(state.quantities.get(id)!) // render quantity editor
+                .render(state.project.quantities.get(id)!) // render quantity editor
                 .map(x => x(this.update)) // pass the update function to the UI
                 .map(el =>
                     <tr key={el.props['data-key']}>

@@ -170,7 +170,7 @@ function getRenderers(): rendererArray<rendered, SerializedEquation>
                     {
                         const id1 = get();
                         const id2 = e.target.value;
-                        const eqns = state.equations;
+                        const eqns = state.project.equations;
 
                         if (id2 !== id1 && eqns.has(id2))
                         {
@@ -261,9 +261,9 @@ const codeToTex = (function()
 
 function toTexHandler(c: any)
 {
-    if (typeof c.name === 'string' && state.quantities.has(c.name))
+    if (typeof c.name === 'string' && state.project.quantities.has(c.name))
     {
-        const qty = state.quantities.get(c.name) as Quantity;
+        const qty = state.project.quantities.get(c.name) as Quantity;
         return qty.tex;
     }
 
@@ -312,10 +312,10 @@ class PasteEquationButton extends React.Component<ButtonProps>
     {
         const index = state.pointToIndex(state.cursor);
 
-        state.content =
-            state.content.substring(0, index) +
+        state.project.content =
+            state.project.content.substring(0, index) +
             "&Eq(" + this.props.id + ")" +
-            state.content.substring(index);
+            state.project.content.substring(index);
 
         state.dispatchEvent(
             AppState.Event.ContentChange,
@@ -338,10 +338,10 @@ class PasteIndexButton extends React.Component<ButtonProps>
     {
         const index = state.pointToIndex(state.cursor);
 
-        state.content =
-            state.content.substring(0, index) +
+        state.project.content =
+            state.project.content.substring(0, index) +
             "&eqref(" + this.props.id + ")" +
-            state.content.substring(index);
+            state.project.content.substring(index);
 
         state.dispatchEvent(
             AppState.Event.ContentChange,
@@ -378,7 +378,7 @@ extends React.Component<ButtonProps>
 
         if (confirm("Opravdu chceš odstranit rovnici ["+id+"]?"))
         {
-            state.equations.delete(id);
+            state.project.equations.delete(id);
             this.props.tab.update();
         }
     }
@@ -400,7 +400,7 @@ extends React.Component<ButtonProps>
         {
             id = 'equation-'+((Math.random()*1000)|0);
         }
-        while(state.equations.has(id));
+        while(state.project.equations.has(id));
 
         const ref: SerializedEquation =
         {
@@ -409,7 +409,7 @@ extends React.Component<ButtonProps>
             rhs: 'b'
         };
 
-        state.equations.set(id, ref);
+        state.project.equations.set(id, ref);
         state.editingEquation = id;
 
         this.props.tab.update();
@@ -465,7 +465,7 @@ class EquationManager extends Tab<{preview: boolean}>
             }
 
             {
-                Array.from( Iterable.map(state.equations.entries(),
+                Array.from( Iterable.map(state.project.equations.entries(),
                     ([id, eq]) =>
                         this.props.preview
                             ? this.renderPreview(id, eq)
@@ -519,7 +519,7 @@ class EquationManager extends Tab<{preview: boolean}>
             <table><tbody>
             {
                 SerializedEquation
-                .render(state.equations.get(id)!) // render equation editor
+                .render(state.project.equations.get(id)!) // render equation editor
                 .map(x => x(this.update)) // pass the update function to the UI
                 .map(el =>
                     <tr key={el.props['data-key']}>

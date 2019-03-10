@@ -7,6 +7,7 @@ import { Theme } from '@material-ui/core/styles';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Add from '@material-ui/icons/Add';
+import Save from '@material-ui/icons/Save';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -24,7 +25,9 @@ import TextField from '@material-ui/core/TextField';
 
 import { Logo } from './components';
 import Session from './session';
-import state, { AppState } from './state';
+import state, { AppState, setProject } from './state';
+import Project from './project';
+import FS from './filesystem';
 
 interface Menu {
     icon: typeof SvgIcon;
@@ -75,11 +78,27 @@ extends React.Component<Header.Props, Header.State> {
         this.setState({ modal: 'login' });
     }
 
+    private _fileElement: HTMLInputElement | undefined;
+    private setFileRef = (el: HTMLInputElement) => this._fileElement = el;
+    public openFileDialog = () => this._fileElement!.click();
+    public onLoadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files!.item(0)!;
+        e.target.value = null as any;
+        setProject(await FS.loadProject(file));
+    }
+
     private menus: Menus = {
         add: {
             icon: Add,
             items: [
-                { title: 'New Project' }
+                { title: 'New Project', action: () => setProject(new Project()) },
+                { title: 'Load Project', action: this.openFileDialog },
+            ]
+        },
+        save: {
+            icon: Save,
+            items: [
+                { title: 'Save', action: async () => FS.saveAs(await FS.archive(state.project), "project.zip") }
             ]
         },
         user: {
@@ -186,6 +205,12 @@ extends React.Component<Header.Props, Header.State> {
                 <Header.RegisterDialog
                     open={this.state.modal === 'register'}
                     onClose={this.closeModal}
+                />
+                <input
+                    type='file'
+                    ref={this.setFileRef}
+                    style={{ display: 'none' }}
+                    onChange={this.onLoadFile}
                 />
             </AppBar>
         );

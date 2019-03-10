@@ -156,7 +156,7 @@ function genRenderers(tab: ReferenceManager): rendererArray<renderType>
                     {
                         const id1 = get();
                         const id2 = e.target.value;
-                        const refs = state.references;
+                        const refs = state.project.references;
 
                         if (id2 !== id1 && refs.has(id2))
                         {
@@ -381,10 +381,10 @@ extends React.Component<ButtonProps>
     {
         const index = state.pointToIndex(state.cursor);
 
-        state.content =
-            state.content.substring(0, index) +
+        state.project.content =
+            state.project.content.substring(0, index) +
             "&cite(" + this.props.id + ")" +
-            state.content.substring(index);
+            state.project.content.substring(index);
 
         state.dispatchEvent(
             AppState.Event.ContentChange,
@@ -424,7 +424,7 @@ extends React.Component<ButtonProps>
 
         if (confirm("Opravdu chceš odstranit referenci ["+id+"]?"))
         {
-            state.references.delete(id);
+            state.project.references.delete(id);
             this.props.tab.forceUpdate();
         }
     }
@@ -446,7 +446,7 @@ extends React.Component<ButtonProps>
         {
             id = 'reference-'+((Math.random()*1000)|0);
         }
-        while(state.references.has(id));
+        while(state.project.references.has(id));
 
         const ref: Reference.Params =
         {
@@ -455,7 +455,7 @@ extends React.Component<ButtonProps>
             authors: {names: [], etAl: false}
         };
 
-        state.references.set(id, ref);
+        state.project.references.set(id, ref);
         state.editingReference = id;
 
         this.props.tab.forceUpdate();
@@ -512,7 +512,7 @@ class ReferenceManager extends Tab<{preview: boolean}>
             }
 
             {
-                Array.from( Iterable.map(state.references.values(),
+                Array.from( Iterable.map(state.project.references.values(),
                     r =>
                         this.props.preview
                             ? this.renderPreview(r)

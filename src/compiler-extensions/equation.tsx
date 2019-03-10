@@ -20,7 +20,7 @@ export default function insertPlugin(md: MarkdownIt, appState: AppState)
     {
         const index = usedEqns.indexOf(id);
 
-        if (!appState.equations.has(id))
+        if (!appState.project.equations.has(id))
         {
             return <span className="ref-eqref ref-index ref-intext error">(Neznámé id citované rovnice: {id})</span>
         }
@@ -35,10 +35,10 @@ export default function insertPlugin(md: MarkdownIt, appState: AppState)
 
     function renderInlineEquation(id: string)
     {
-        if (!appState.equations.has(id))
+        if (!appState.project.equations.has(id))
         return <span className='eqn-body error'>(Neznámé id rovnice: {id})</span>;
 
-        const eq = appState.equations.get(id)!;
+        const eq = appState.project.equations.get(id)!;
 
         return (
             <span className='eqn-body' dangerouslySetInnerHTML={{

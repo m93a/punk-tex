@@ -83,7 +83,7 @@ class DataManager extends Tab
     {
         const arr: React.ReactChild[] = [];
 
-        for (const table of state.tables.values())
+        for (const table of state.project.tables.values())
         {
             arr.push(
                 <ListItem
@@ -107,9 +107,9 @@ class DataManager extends Tab
 
     private renderTable()
     {
-        if (state.tables.has(state.editingTable!))
+        if (state.project.tables.has(state.editingTable!))
         {
-            const table = state.tables.get(state.editingTable!)!;
+            const table = state.project.tables.get(state.editingTable!)!;
 
             return this.tableMaker.render(table);
         }
@@ -122,7 +122,7 @@ class DataManager extends Tab
 
     public onPaste = (e: React.ClipboardEvent) =>
     {
-        state.tables.set('pasted', dataFromHtml(e.clipboardData.getData('text/html')));
+        state.project.tables.set('pasted', dataFromHtml(e.clipboardData.getData('text/html')));
         state.editingEquation = 'pasted';
         this.forceUpdate();
     }

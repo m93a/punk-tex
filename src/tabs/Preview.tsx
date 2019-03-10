@@ -20,7 +20,7 @@ export default class Preview extends Tab
 
     public onChange = () =>
     {
-        renderToElement(this.id, this.props.state.content);
+        renderToElement(this.id, this.props.state.project.content);
     }
 
     public componentWillMount()
@@ -34,11 +34,13 @@ export default class Preview extends Tab
     public componentDidMount()
     {
         this.props.state.addEventListener(AppState.Event.ContentChange, this.onChange);
+        this.props.state.addEventListener(AppState.Event.ProjectChange, this.onChange);
         this.onChange();
     }
 
     public componentWillUnmount()
     {
         this.props.state.removeEventListener(AppState.Event.ContentChange, this.onChange);
+        this.props.state.removeEventListener(AppState.Event.ProjectChange, this.onChange);
     }
 }

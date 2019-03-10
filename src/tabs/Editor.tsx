@@ -32,7 +32,7 @@ export default class Editor extends Tab
             wrapEnabled
             height="100%"
             width="95%"
-            value={this.props.state.content}
+            value={this.props.state.project.content}
         />;
     }
 
@@ -51,7 +51,7 @@ export default class Editor extends Tab
 
     public onInternalChange = (content: string) =>
     {
-        this.props.state.content = content;
+        this.props.state.project.content = content;
         this.props.state.dispatchEvent(
             AppState.Event.ContentChange,
             { source: this }
