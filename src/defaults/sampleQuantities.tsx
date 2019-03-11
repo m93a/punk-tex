@@ -5,7 +5,7 @@ export default () => {
 
     sampleQuantities.set('timeCoeff', {id: 'timeCoeff', name: 'Časový koeficient', tex: '\\tau'});
     sampleQuantities.set('resistance', {id: 'resistance', name: 'Odpor', tex: 'R'});
-    sampleQuantities.set('capacity', {id: 'capacitance', name: 'Kapacita', tex: 'C'});
+    sampleQuantities.set('capacity', {id: 'capacity', name: 'Kapacita', tex: 'C'});
 
     return sampleQuantities;
 };

@@ -4,78 +4,73 @@ import { LambdaCache, hashObject } from 'src/lib/react-helpers';
 import { Table, TableBody, TableHead, TableRow, TableCell } from '@material-ui/core';
 import { FaCog } from "react-icons/fa";
 
-import DataManager, { Data, DataColumn } from ".";
+import DataManager, { Data, DataColumn, resolveData } from ".";
 import { ColumnSettings } from './ColumnSettings';
 
+export namespace TableMaker
+{
+    export interface Props
+    {
+        manager: DataManager;
+        data: Data;
+    }
+}
 export class TableMaker
+extends React.Component<TableMaker.Props>
 {
     private cacheOrRetrieve = LambdaCache();
-    private ref: DataManager;
 
-    constructor(ref: DataManager)
-    {
-        this.ref = ref;
-    }
-
-    public render(data: Data)
+    public render()
     {
         return <Table>
-            { this.renderHead(data) }
-            { this.renderBody(data) }
+            { this.renderHead() }
+            { this.renderBody() }
             { this.renderDialog() }
         </Table>
     }
 
-    public renderHead(data: Data)
+    private renderHead()
     {
         return <TableHead>
-            { data.columns.map( col => this.renderHeading(col)) }
+            { this.props.data.columns.map( col => this.renderHeading(col)) }
         </TableHead>
     }
 
-    public renderHeading(col: DataColumn)
+    private renderHeading(col: DataColumn)
     {
         return <TableCell component="th" key={hashObject(col)}>
             {col.quantity ? col.quantity.name : "[veličina]"}{" "}
-            <FaCog className="icon button" onClick={this.cacheOrRetrieve(col, this.ref.modals, () => { this.ref.modals.openColumnSettings = col; this.ref.forceUpdate() })} /> {/* Yes I can make a line this long. */}
+            <FaCog className="icon button" onClick={this.cacheOrRetrieve(col, this.props.manager.modals, () => { this.props.manager.modals.openColumnSettings = col; this.props.manager.forceUpdate() })} /> {/* Yes I can make a line this long. */}
         </TableCell>;
     }
 
-    public renderBody(data: Data)
+    private renderBody()
     {
-        const columns = data.columns;
-        const rowArr: React.ReactChild[] = [];
-
-        for (let row = 0 ;; row++)
-        {
-            const colArr = columns.map(col => this.renderCell(col, row));
-
-            rowArr.push(<TableRow>{colArr}</TableRow>);
-
-            if (columns.every(col => col.values.length <= row)) break;
-        }
+        const columns = this.props.data.columns;
 
         return <TableBody>
-            { rowArr }
-        </TableBody>
+            { resolveData(this.props.data).map( (row, r) =>
+                <TableRow key={hashObject(row)}>
+                    { row.map( (value, c) =>
+                        <TableCell key={hashObject(columns[c])}>
+                            {
+                                value === undefined
+                                ? ""
+                                : columns[c].values[r] === undefined
+                                ? <i>{value}</i>
+                                : value
+                            }
+                        </TableCell>
+                    ) }
+                </TableRow>
+            ) }
+        </TableBody>;
     }
 
-    public renderCell(col: DataColumn, rowIndex: number)
+    private renderDialog()
     {
-        return (
-            <TableCell
-                contentEditable
-                key={`${hashObject(col)}[${rowIndex}]`}
-            >
-                {col.values[rowIndex]}
-
-            </TableCell>
-        );
-    }
-
-    public renderDialog()
-    {
-        const modals = this.ref.modals;
+        const manager = this.props.manager;
+        const modals = manager.modals;
 
         if (!modals.openColumnSettings) return;
 
@@ -85,7 +80,7 @@ export class TableMaker
                 onClose={this.cacheOrRetrieve(
                     modals, () => {
                         modals.openColumnSettings = undefined;
-                        this.ref.forceUpdate();
+                        manager.forceUpdate();
                     }
                 )}
             />

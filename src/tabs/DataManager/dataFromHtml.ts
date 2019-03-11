@@ -1,7 +1,7 @@
 import { Data } from ".";
 import * as parseDecimal from 'parse-decimal-number';
 
-export default function dataFromHtml(src: string): Data
+export default function dataFromHtml(src: string): Data | null
 {
     const data: Data = {
         id: 'pasted',
@@ -13,6 +13,8 @@ export default function dataFromHtml(src: string): Data
 
     const doc = (new DOMParser()).parseFromString(src, 'text/html');
     const table: HTMLElement = doc.getElementsByTagName('table')[0];
+
+    if (!table) return null;
 
     let i = 0;
     for (const tr of table.getElementsByTagName('tr'))
@@ -31,6 +33,8 @@ export default function dataFromHtml(src: string): Data
 
         i++;
     }
+
+    if (i === 0) return null;
 
     return data;
 }

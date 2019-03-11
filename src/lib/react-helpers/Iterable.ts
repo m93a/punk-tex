@@ -443,9 +443,7 @@ namespace IterableHelpers
     )
     : T[]
     {
-        const arr: T[] = [];
-        forOf(iterable, el => arr.push(el));
-        return arr;
+        return Array.from(iterable);
     }
 }
 
