@@ -158,7 +158,7 @@ export function resolveData(data: Data): cellValue[][]
 
             if (value === undefined && column.equation)
             {
-                const scope: { [name: string]: cellValue } = Object.create(null);
+                const scope: { [name: string]: cellValue } = {}; // ? Object.create(null) doesn't work
 
                 for (let prevCol = 0; prevCol < col; prevCol++)
                 {

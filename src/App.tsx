@@ -1,4 +1,3 @@
-// Global
 import * as React from 'react';
 import './styles/App.css';
 import state, { AppState } from './state';
