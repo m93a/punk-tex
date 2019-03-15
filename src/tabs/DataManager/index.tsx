@@ -86,6 +86,7 @@ class DataManager extends Tab
         {
             arr.push(
                 <ListItem
+                    key={table.id}
                     button
                     selected={state.editingTable === table.id}
                     onClick={this.cacheOrRetrieve('menu-click', table.id, () => {
@@ -136,52 +137,73 @@ export default DataManager;
 
 
 type cellValue = number|string|undefined;
+const resolvedCache = new WeakMap<Data, cellValue[][]>();
 
 /**
  * @returns arr[row][col]
  */
 export function resolveData(data: Data): cellValue[][]
 {
+    if (resolvedCache.has(data))
+        return resolvedCache.get(data)!;
+
+    else
+        return computeData(data);
+}
+
+export function computeData(data: Data): cellValue[][]
+{
     const columns = data.columns;
-    const rowArr: cellValue[][] = [];
+    if (!resolvedCache.has(data)) resolvedCache.set(data, []);
+    const rowArr = resolvedCache.get(data)!;
 
     for (let row = 0 ;; row++)
     {
         if (columns.every(column => column.values.length <= row)) break;
-
-        const colArr: cellValue[] = [];
-
-        for (let col = 0; col < columns.length; col++)
-        {
-            const column = columns[col];
-            let value = column.values[row];
-
-            if (value === undefined && column.equation)
-            {
-                const scope: { [name: string]: cellValue } = {}; // ? Object.create(null) doesn't work
-
-                for (let prevCol = 0; prevCol < col; prevCol++)
-                {
-                    const prevColumn = columns[prevCol];
-                    if (prevColumn.quantity) scope[prevColumn.quantity.id] = colArr[prevCol];
-                }
-
-                try {
-                    value = math.eval(column.equation.rhs, scope);
-                }
-                catch (e)
-                {
-                    console.error(e);
-                    value = "error";
-                }
-            }
-
-            colArr.push(value);
-        }
-
-        rowArr.push(colArr);
+        computeRow(data, row);
     }
 
-    console.log(rowArr);
     return rowArr;
+}
+
+
+
+export function computeRow(data: Data, row: number, col = 0): cellValue[]
+{
+    const rowArr = resolvedCache.get(data);
+    if (!rowArr) return computeData(data)[row];
+
+    const columns = data.columns;
+    if (!rowArr[row]) { rowArr[row] = []; col = 0; }
+    const colArr = rowArr[row];
+
+    for (; col < columns.length; col++)
+    {
+        const column = columns[col];
+        let value = column.values[row];
+
+        if (value === undefined && column.equation)
+        {
+            const scope: { [name: string]: cellValue } = {}; // ? Object.create(null) doesn't work
+
+            for (let prevCol = 0; prevCol < col; prevCol++)
+            {
+                const prevColumn = columns[prevCol];
+                if (prevColumn.quantity) scope[prevColumn.quantity.id] = colArr[prevCol];
+            }
+
+            try {
+                value = math.eval(column.equation.rhs, scope);
+            }
+            catch (e)
+            {
+                console.error(e);
+                value = "error";
+            }
+        }
+
+        colArr[col] = value;
+    }
+
+    return colArr;
 }

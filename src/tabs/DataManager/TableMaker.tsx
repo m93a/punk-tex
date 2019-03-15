@@ -4,7 +4,7 @@ import { LambdaCache, hashObject } from 'src/lib/react-helpers';
 import { Table, TableBody, TableHead, TableRow, TableCell } from '@material-ui/core';
 import { FaCog } from "react-icons/fa";
 
-import DataManager, { Data, DataColumn, resolveData } from ".";
+import DataManager, { Data, DataColumn, resolveData, computeRow } from ".";
 import { ColumnSettings } from './ColumnSettings';
 
 export namespace TableMaker
@@ -25,7 +25,7 @@ extends React.Component<TableMaker.Props>
         return <Table>
             { this.renderHead() }
             { this.renderBody() }
-            { this.renderDialog() }
+            { this.renderSettings() }
         </Table>
     }
 
@@ -40,7 +40,10 @@ extends React.Component<TableMaker.Props>
     {
         return <TableCell component="th" key={hashObject(col)}>
             {col.quantity ? col.quantity.name : "[veličina]"}{" "}
-            <FaCog className="icon button" onClick={this.cacheOrRetrieve(col, this.props.manager.modals, () => { this.props.manager.modals.openColumnSettings = col; this.props.manager.forceUpdate() })} /> {/* Yes I can make a line this long. */}
+            <FaCog
+                className="icon button"
+                onClick={this.cacheOrRetrieve('openSettings', col, () => this.openSettings(col))}
+            />
         </TableCell>;
     }
 
@@ -53,13 +56,7 @@ extends React.Component<TableMaker.Props>
                 <TableRow key={hashObject(row)}>
                     { row.map( (value, c) =>
                         <TableCell key={hashObject(columns[c])}>
-                            {
-                                value === undefined
-                                ? ""
-                                : columns[c].values[r] === undefined
-                                ? <i>{value}</i>
-                                : value
-                            }
+                            { this.renderCell(c, r, value) }
                         </TableCell>
                     ) }
                 </TableRow>
@@ -67,7 +64,56 @@ extends React.Component<TableMaker.Props>
         </TableBody>;
     }
 
-    private renderDialog()
+    private renderCell(c: number, r: number, value?: number|string)
+    {
+        const columns = this.props.data.columns;
+
+        const callback = this.cacheOrRetrieve('cellChange', c, r,
+            (e: React.ChangeEvent<HTMLInputElement>) => this.onCellChange(c, r, e.target.value)
+        );
+
+        if (value === undefined)
+        {
+            return <input
+                onChange={callback}
+                style={{width:"30px"}}
+            />
+        }
+        else if (columns[c].values[r])
+        {
+            return <input
+                defaultValue={value + ''}
+                onChange={callback}
+                style={{width:"30px"}}
+            />
+        }
+        else
+        {
+            return <input
+                placeholder={value + ''}
+                onChange={callback}
+                style={{width:"30px"}}
+            />
+        }
+    }
+
+    private onCellChange(c: number, r: number, value?: number|string)
+    {
+        if (value === "") value = undefined;
+        const data = this.props.data;
+        data.columns[c].values[r] = value;
+        computeRow(data, r, c);
+        this.forceUpdate();
+    }
+
+    private openSettings(col: DataColumn)
+    {
+        const mgr = this.props.manager
+        mgr.modals.openColumnSettings = col;
+        mgr.forceUpdate();
+    }
+
+    private renderSettings()
     {
         const manager = this.props.manager;
         const modals = manager.modals;
