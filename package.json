@@ -17,7 +17,7 @@
     "incremental-dom": "^0.5.1",
     "jszip": "^3.2.0",
     "jwt-decode": "^2.2.0",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "markdown-it": "^8.4.2",
     "markdown-it-incremental-dom": "^2.0.2",
     "markdown-it-math": "^4.1.0",
